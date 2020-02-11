@@ -1,9 +1,7 @@
-<ion-content padding>
-  <ion-list>
-    <ion-item *ngFor="let i of dataList">{{ i }} </ion-item>
-  </ion-list>
+<ion-list>
+  <ion-item *ngFor="let i of dataList">{{ i }}</ion-item>
+</ion-list>
 
-  <ion-infinite-scroll (ionInfinite)="loadData($event)">
-    <ion-infinite-scroll-content> </ion-infinite-scroll-content>
-  </ion-infinite-scroll>
-</ion-content>
+<ion-infinite-scroll (ionInfinite)="loadData($event)">
+  <ion-infinite-scroll-content></ion-infinite-scroll-content>
+</ion-infinite-scroll>

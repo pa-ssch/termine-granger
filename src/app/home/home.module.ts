@@ -1,3 +1,4 @@
+import { TaskComponent } from "./../_component/task/task.component";
 import { TaskListComponent } from "./../_component/task-list/task-list.component";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
@@ -18,6 +19,6 @@ import { HomePage } from "./home.page";
       }
     ])
   ],
-  declarations: [HomePage, TaskListComponent]
+  declarations: [HomePage, TaskListComponent, TaskComponent]
 })
 export class HomePageModule {}

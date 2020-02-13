@@ -1,0 +1,20 @@
+<ion-item-sliding>
+  <ion-item>
+    <ion-checkbox disabled="false"></ion-checkbox>
+    <ion-label>{{ content }}</ion-label>
+    <ion-button [routerLink]="['/home/', content]" routerDirection="forward"
+      >Open...</ion-button
+    >
+    <ion-badge item-end>Group</ion-badge>
+  </ion-item>
+  <ion-item-options side="start">
+    <ion-item-option>A</ion-item-option>
+  </ion-item-options>
+  <ion-item-options side="end">
+    <ion-item-option>B</ion-item-option>
+  </ion-item-options>
+</ion-item-sliding>
+
+<!-- ion-button
+[navPush]="input"
+[navParams]="{{idOrObjectMussEvtlListeSein}}" -->

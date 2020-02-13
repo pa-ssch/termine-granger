@@ -15,7 +15,7 @@ export class TaskListComponent implements OnInit {
 
   loadData(event?: any) {
     for (let i = 0; i < 25; i++) {
-      this.dataList.push("Item number " + this.dataList.length);
+      this.dataList.push("Item " + this.dataList.length);
     }
 
     event?.target.complete();

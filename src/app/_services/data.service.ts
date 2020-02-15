@@ -70,7 +70,7 @@ export class DataService {
   }
 
   /** Liefert alle Personen in der Datenbank */
-  GetAllPerson(onsuccessfunction: (result: any[]) => any): any {
+  GetAllPerson(onsuccessfunction: (result: any[]) => void): any {
     if (this.openReq.readyState !== "done")
       return this.openReq.addEventListener("success", () =>
         this.GetAllPerson(onsuccessfunction)

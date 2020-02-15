@@ -22,6 +22,7 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
+      // db verbinden... -> wenn erstellt wird --> tutorial
     });
   }
 }

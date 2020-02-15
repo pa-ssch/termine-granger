@@ -5,8 +5,16 @@ import { Component, OnInit, Input } from "@angular/core";
   styleUrls: ["./task.component.scss"]
 })
 export class TaskComponent implements OnInit {
-  @Input() content;
+  @Input() tId: number;
+  hasChilds: boolean;
+  className: string;
+  subPath: string;
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    if ((this.hasChilds = this.tId % 3 == 0)) {
+      this.className = "readonly";
+      this.subPath = `/list/${this.tId}`;
+    }
+  }
 }

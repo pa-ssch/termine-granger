@@ -7,10 +7,9 @@ import { ActivatedRoute } from "@angular/router";
   styleUrls: ["home.page.scss"]
 })
 export class HomePage implements OnInit {
-  taskId;
-  constructor(private activatedRoute: ActivatedRoute) {}
-
-  ngOnInit() {
-    this.taskId = this.activatedRoute.snapshot.paramMap.get("taskId");
+  constructor() {
+    // wenn erster start --> set root tutorial
   }
+
+  ngOnInit() {}
 }

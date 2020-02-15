@@ -1,9 +1,13 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" [text]="'Back'"></ion-back-button>
+    </ion-buttons>
     <ion-title>input</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <ion-label>{{tId}}</ion-label>
+  <ion-button expand="block">save</ion-button>
 </ion-content>

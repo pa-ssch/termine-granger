@@ -1,13 +1,15 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Input } from "@angular/core";
 @Component({
   selector: "app-task-list",
   templateUrl: "task-list.component.html",
   styleUrls: ["task-list.component.scss"]
 })
 export class TaskListComponent implements OnInit {
-  dataList: string[] = [];
+  @Input() tId: number;
+  dataList: number[] = [];
 
   ngOnInit(): void {
+    if (!this.tId) this.tId = 0;
     this.loadData();
   }
 
@@ -15,7 +17,7 @@ export class TaskListComponent implements OnInit {
 
   loadData(event?: any) {
     for (let i = 0; i < 25; i++) {
-      this.dataList.push("Item " + this.dataList.length);
+      this.dataList.push(this.dataList.length + this.tId * 1000);
     }
 
     event?.target.complete();

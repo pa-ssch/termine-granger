@@ -1,13 +1,13 @@
 <ion-header>
   <ion-toolbar>
-    <ion-searchbar animated="true" placeholder="Suchen..."></ion-searchbar>
+    <ion-searchbar placeholder="Suchen..."></ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <app-task-list></app-task-list>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" edge>
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -17,17 +17,10 @@
     </ion-fab-list>
   </ion-fab>
 </ion-content>
-
-<!-- Extra Page für home seite und SUb seite !!!!! den content (incl. fab?) als component! -->
-
 <ion-footer>
-  <ion-toolbar>
-    {{taskId}}
-  </ion-toolbar>
+  <ion-toolbar></ion-toolbar>
 </ion-footer>
-
 <!--
 - ion-toolbar (head & foot incl. Buttons)
-- ion-fab als Neu-Button (+ evtl. mehr)
 - ion-modal (abgehakte elemente) durch wischen von unten
 -->

@@ -1,5 +1,5 @@
 <ion-list>
-  <app-task *ngFor="let i of dataList" [content]="i"></app-task>
+  <app-task *ngFor="let i of dataList" [tId]="i"></app-task>
 </ion-list>
 
 <ion-infinite-scroll (ionInfinite)="loadData($event)">

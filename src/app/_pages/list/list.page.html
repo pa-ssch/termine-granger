@@ -1,9 +1,15 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>list</ion-title>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" [text]="'Back'"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Sublist {{tId}}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <app-task-list [tId]="tId"></app-task-list>
 </ion-content>
+<ion-footer>
+  <ion-toolbar></ion-toolbar>
+</ion-footer>

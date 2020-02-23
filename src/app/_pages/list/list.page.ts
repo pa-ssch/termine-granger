@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { Group } from "src/app/data/Accessible/Group";
 
 @Component({
   selector: "app-list",

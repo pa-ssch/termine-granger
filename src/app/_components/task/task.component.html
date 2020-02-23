@@ -1,13 +1,17 @@
 <ion-item-sliding>
-  <ion-item [routerLink]="subPath" routerDirection="forward" detail="false">
+  <ion-item
+    [routerLink]="hasChilds ? ['/list/', tId] : ''"
+    routerDirection="forward"
+    [detail]="hasChilds"
+  >
     <ion-checkbox
       [indeterminate]="hasChilds"
-      [class]="className"
+      [class]="hasChilds ? 'readonly' : ''"
       [color]="hasChilds ? 'medium' : 'primary'"
     ></ion-checkbox>
 
     <ion-label padding-start>{{ tId }}</ion-label>
-    <ion-badge item-end>tag</ion-badge>
+    <ion-badge item-end *ngIf="hasChilds">42</ion-badge>
   </ion-item>
 
   <ion-item-options side="start">

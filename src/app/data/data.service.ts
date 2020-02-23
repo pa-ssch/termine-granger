@@ -1,3 +1,4 @@
+import { Group } from "./Accessible/Group";
 import { Injectable } from "@angular/core";
 
 @Injectable({
@@ -6,14 +7,14 @@ import { Injectable } from "@angular/core";
 export class DataService {
   private IndxDb: IDBFactory;
   private db: IDBDatabase;
-  private static readonly DB_NAME = "IRU_DB";
+  private static readonly DB_NAME = "TG_DB";
   private openReq: IDBOpenDBRequest;
 
   constructor() {
     this.IndxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
 
     // Open & Init DB
-    this.openReq = this.IndxDb.open("IRU_DB", 1);
+    this.openReq = this.IndxDb.open(DataService.DB_NAME, 1);
     this.openReq.addEventListener(
       "success",
       () => (this.db = this.openReq.result)
@@ -62,9 +63,8 @@ export class DataService {
     } else if (person.value <= 0) {
       let req = personStore.put(person);
       // req.onerror = function(event) {};
-      req.addEventListener(
-        "success",
-        () => (person.id = +req.result.valueOf())
+      req.addEventListener("success", () =>
+        (person as AccessibleDataObject).UpdateId(req)
       );
     }
   }

@@ -3,11 +3,86 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/home" [text]="'Back'"></ion-back-button>
     </ion-buttons>
-    <ion-title>input</ion-title>
+    <ion-title>Eingabe</ion-title>
+    <!-- gruppe (label) evtl. als Chip -->
+    <ion-buttons slot="end">
+      <ion-button slot="end">
+        <ion-icon slot="icon-only" name="save"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-label>{{tId}}</ion-label>
-  <ion-button expand="block">save</ion-button>
+  <ion-card
+    ><ion-input
+      placeholder="Titel"
+      padding
+      class="input-large"
+      value="{{tId}}"
+    ></ion-input>
+  </ion-card>
+
+  <ion-card>
+    <ion-item>
+      <ion-label>Zeitangaben</ion-label>
+      <ion-toggle slot="end">View</ion-toggle>
+    </ion-item>
+
+    <ion-card-content>
+      <ion-item no-padding lines="none">
+        <ion-icon name="hourglass" slot="start">dauer</ion-icon></ion-item
+      >
+
+      <ion-item no-padding lines="none">
+        <ion-icon name="golf" slot="start"></ion-icon>deadline</ion-item
+      >
+
+      <ion-item no-padding lines="none">
+        <ion-icon name="time" slot="start"></ion-icon>
+        <ion-datetime
+          no-padding
+          displayFormat="DDD MMM D, YYYY"
+          min="2005"
+          max="2016"
+          value="2008-09-02"
+        ></ion-datetime>
+
+        <ion-datetime
+          slot="end"
+          displayFormat="HH:mm"
+          value="12:00"
+        ></ion-datetime>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <!--
+-- Zeitblock
+  duration?: nummer + einheit (Stunden, Tage, w, m, j);
+  deadLineTime?: Date;
+  
+-- reminderblock
+  reminder liste mit adds
+
+
+-- zusatzInfoblock
+  priority: | 0 | 1 | 2 | (segment)
+  (toggle)   is blocker 
+  description (textarea / multiline input)
+  
+-- Funktionsblock
+  (block button) split
+  (block button) isDone
+  (block button) Gruppe ändern
+-->
+
+  <!-- 
+Datenmodell anpassen
+-> Gruppe nicht extra sondern string an task
+-> wenn man selbst nix hat, aber parent, dann ist parent gruppe (name von parent oder gruppenname)
+termine ohne datum reorderbar? 
+
+
+ -->
 </ion-content>

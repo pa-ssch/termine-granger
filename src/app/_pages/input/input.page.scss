@@ -5,3 +5,17 @@
   font-weight: bold;
   --color: var(--ion-color-dark);
 }
+
+ion-segment-button[value="low"] {
+  --indicator-color: var(--ion-color-ok);
+  --color-checked: var(--ion-color-ok-contrast);
+  --color-focused: var(--ion-color-ok);
+  --color-hover: var(--ion-color-ok);
+}
+
+ion-segment-button[value="high"] {
+  --indicator-color: var(--ion-color-danger);
+  --color-checked: var(--ion-color-danger-contrast);
+  --color-focused: var(--ion-color-danger);
+  --color-hover: var(--ion-color-danger);
+}

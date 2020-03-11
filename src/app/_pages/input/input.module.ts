@@ -1,3 +1,4 @@
+import { ReminderComponent } from "./../../_components/reminder/reminder.component";
 import { NgModule } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -10,6 +11,6 @@ import { InputPage } from "./input.page";
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, InputPageRoutingModule],
-  declarations: [InputPage]
+  declarations: [InputPage, ReminderComponent]
 })
 export class InputPageModule {}

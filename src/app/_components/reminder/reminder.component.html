@@ -1,0 +1,15 @@
+<ion-item no-padding lines="full">
+  <ion-icon name="alarm" slot="start"></ion-icon>
+  <!-- wenn null -->
+  <ion-datetime
+    placeholder="hinzufügen..."
+    class="leftAlign"
+    displayFormat="DD.MM.YYYY hh:mm"
+    no-padding
+    [value]="!rId ? null : '2009-09-09'"
+    (ionChange)="dateChanged()"
+  ></ion-datetime>
+
+  <!-- wenn nicht null -->
+  <ion-icon *ngIf="rId" name="close" size="small" slot="end"></ion-icon>
+</ion-item>

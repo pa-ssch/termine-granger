@@ -17,7 +17,6 @@
   <ion-card
     ><ion-input
       placeholder="Titel"
-      padding
       class="input-large"
       value="{{tId}}"
     ></ion-input>
@@ -31,18 +30,35 @@
 
     <ion-card-content>
       <ion-item no-padding lines="none">
-        <ion-icon name="hourglass" slot="start">dauer</ion-icon></ion-item
-      >
+        <ion-icon name="hourglass" slot="start"></ion-icon>
+        <ion-label>Dauer</ion-label>
+        <!-- duration?: nummer + einheit (Stunden, Tage, w, m, j); -->
+      </ion-item>
 
       <ion-item no-padding lines="none">
-        <ion-icon name="golf" slot="start"></ion-icon>deadline</ion-item
-      >
-
-      <ion-item no-padding lines="none">
-        <ion-icon name="time" slot="start"></ion-icon>
+        <ion-icon name="golf" slot="start"></ion-icon>
         <ion-datetime
+          class="leftAlign"
           no-padding
-          displayFormat="DDD MMM D, YYYY"
+          displayFormat="DD.MM.YYYY"
+          min="2005"
+          max="2016"
+          value="2008-09-02"
+        ></ion-datetime>
+
+        <ion-datetime
+          slot="end"
+          displayFormat="HH:mm"
+          value="12:00"
+        ></ion-datetime>
+      </ion-item>
+
+      <ion-item no-padding lines="none">
+        <ion-icon name="play" slot="start"></ion-icon>
+        <ion-datetime
+          class="leftAlign"
+          no-padding
+          displayFormat="DD.MM.YYYY"
           min="2005"
           max="2016"
           value="2008-09-02"
@@ -57,25 +73,63 @@
     </ion-card-content>
   </ion-card>
 
-  <!--
--- Zeitblock
-  duration?: nummer + einheit (Stunden, Tage, w, m, j);
-  deadLineTime?: Date;
-  
--- reminderblock
-  reminder liste mit adds
+  <ion-card>
+    <ion-item>
+      <ion-label>Erinnerungen</ion-label>
+    </ion-item>
+    <ion-card-content>
+      <app-reminder *ngFor="let i of reminderList" [rId]="i"></app-reminder>
+      <app-reminder></app-reminder>
+    </ion-card-content>
+  </ion-card>
 
+  <ion-card>
+    <ion-item>
+      <ion-label>Zusatzinformationen</ion-label>
+    </ion-item>
+    <ion-card-content>
+      <ion-item no-padding lines="full">
+        <ion-icon name="alert-circle" slot="start"></ion-icon>
+        <ion-segment mode="ios" value="medium">
+          <ion-segment-button value="low" layout="icon-bottom">
+            <ion-icon name="arrow-down-circle"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="medium" layout="icon-bottom">
+            <ion-icon name="ellipse-outline"></ion-icon>
+          </ion-segment-button>
+          <ion-segment-button value="high" layout="icon-top">
+            <ion-icon name="arrow-up-circle"></ion-icon>
+          </ion-segment-button>
+        </ion-segment>
+      </ion-item>
 
--- zusatzInfoblock
-  priority: | 0 | 1 | 2 | (segment)
-  (toggle)   is blocker 
-  description (textarea / multiline input)
-  
--- Funktionsblock
-  (block button) split
-  (block button) isDone
-  (block button) Gruppe ändern
--->
+      <ion-item no-padding lines="full">
+        <ion-icon name="reader" slot="start"></ion-icon>
+        <ion-textarea
+          auto-grow="true"
+          rows="1"
+          placeholder="Hier Infos eingeben"
+        ></ion-textarea>
+      </ion-item>
+
+      <ion-item no-padding lines="none">
+        <ion-icon name="shield" slot="start"></ion-icon>
+        <ion-label>Ist Blocker</ion-label>
+        <ion-toggle></ion-toggle>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-item>
+      <ion-label>Funktionen</ion-label>
+    </ion-item>
+    <ion-card-content>
+      <ion-button expand="block">Split</ion-button>
+      <ion-button expand="block">IsDone</ion-button>
+      <ion-button expand="block">Change Group</ion-button>
+    </ion-card-content>
+  </ion-card>
 
   <!-- 
 Datenmodell anpassen
@@ -84,5 +138,9 @@ Datenmodell anpassen
 termine ohne datum reorderbar? 
 
 
+
+todo ionic 5: Padding left bei Android liste, ios titel-input und beiden time-dropdowns 
+
+vlt grid?
  -->
 </ion-content>

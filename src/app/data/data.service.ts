@@ -1,5 +1,6 @@
 import { Group } from "./Accessible/Group";
 import { Injectable } from "@angular/core";
+import { AccessibleDataObject } from "./AccessibleDataObject";
 
 @Injectable({
   providedIn: "root"

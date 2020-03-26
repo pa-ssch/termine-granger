@@ -1,3 +1,5 @@
+import { AccessibleDataObject } from "../AccessibleDataObject";
+
 export class Reminder extends AccessibleDataObject {
   get reminderId(): number {
     return this.id;

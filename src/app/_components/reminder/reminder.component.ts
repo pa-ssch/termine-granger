@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 
 @Component({
   selector: "app-reminder",
@@ -6,14 +6,18 @@ import { Component, OnInit, Input } from "@angular/core";
   styleUrls: ["./reminder.component.scss"]
 })
 export class ReminderComponent implements OnInit {
-  @Input() rId: number;
+  @Input() time: string;
+  @Output() update: EventEmitter<string> = new EventEmitter();
 
   constructor() {}
 
   ngOnInit() {}
 
   dateChanged() {
-    // - neuen reminder der liste hinzufügen
-    // - rId setzen?
+    this.update.emit(this.time);
+  }
+
+  remove() {
+    this.update.emit();
   }
 }

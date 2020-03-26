@@ -78,8 +78,11 @@
       <ion-label>Erinnerungen</ion-label>
     </ion-item>
     <ion-card-content>
-      <app-reminder *ngFor="let i of reminderList" [rId]="i"></app-reminder>
-      <app-reminder></app-reminder>
+      <app-reminder
+        *ngFor="let r of reminderList"
+        [time]="r.time?.toISOString()"
+        (update)="updateReminder($event, r)"
+      ></app-reminder>
     </ion-card-content>
   </ion-card>
 

@@ -1,6 +1,7 @@
 import { ExtSource } from "./ExtSource";
 import { Group } from "./Group";
 import { Reminder } from "./Reminder";
+import { AccessibleDataObject } from "../AccessibleDataObject";
 export class Task extends AccessibleDataObject {
   get taskId(): number {
     return this.id;

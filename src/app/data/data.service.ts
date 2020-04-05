@@ -1,6 +1,4 @@
-import { Group } from "./Accessible/Group";
 import { Injectable } from "@angular/core";
-import { AccessibleDataObject } from "./AccessibleDataObject";
 
 @Injectable({
   providedIn: "root"
@@ -29,12 +27,19 @@ export class DataService {
   }
   private CreateOrUpgrade(): any {
     // Upgrade oder neue DB benötigt
+
     var db = this.openReq.result;
     var store = db.createObjectStore("PERSON", {
       keyPath: "id",
       autoIncrement: true
     });
     store.createIndex("IX_ID_UNIQUE", "id", { unique: true });
+
+    // Parent als hierarchical key
+    // An Task ist Gruppe (Indizierter String, nicht unique. Gemeinsam mit Parent ist es unique)
+    // Ext source als Index direkt an Task - nicht unique
+    // Reminder liste direkt an dem Task (eigentlich Datum liste)
+    // Reminder datum (wegen sortierung indiziert - möglich?)
   }
 
   // CloseDB() {
@@ -49,7 +54,6 @@ export class DataService {
       return this.openReq.addEventListener("success", () =>
         this.UpdatePerson(person)
       );
-
     var transaction = this.db.transaction("PERSON", "readwrite");
     // transaction.onerror = function(event) {};
     // transaction.onabort = function(event) {};
@@ -64,9 +68,7 @@ export class DataService {
     } else if (person.value <= 0) {
       let req = personStore.put(person);
       // req.onerror = function(event) {};
-      req.addEventListener("success", () =>
-        (person as AccessibleDataObject).UpdateId(req)
-      );
+      req.addEventListener("success", () => person.UpdateId(req));
     }
   }
 

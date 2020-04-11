@@ -1,28 +1,36 @@
+import { DataService } from "./../../data/data.service";
 import { Component, OnInit, Input } from "@angular/core";
+import { Task } from "src/app/data/Task";
 @Component({
   selector: "app-task-list",
   templateUrl: "task-list.component.html",
-  styleUrls: ["task-list.component.scss"]
+  styleUrls: ["task-list.component.scss"],
 })
 export class TaskListComponent implements OnInit {
   @Input() tId: number;
-  dataList: number[] = [];
+  taskList: Task[] = [];
 
   ngOnInit(): void {
-    if (!this.tId) this.tId = 0;
+    // if (!this.tId) this.tId = 0;
     this.loadData();
   }
 
   constructor() {}
 
   loadData(event?: any) {
-    for (let i = 0; i < 25; i++) {
-      this.dataList.push(this.dataList.length + this.tId * 1000);
-    }
+    DataService.getInstance().getTasks(
+      this.tId,
+      (taskList) => {
+        taskList.forEach((task) => this.taskList.push(task));
+        if (taskList.length < 25 && event) event.target.disabled = true;
+      },
+      this.taskList.length,
+      25
+    );
 
     event?.target.complete();
-
-    // alles geladen
-    if (this.dataList.length == 1000 && event) event.target.disabled = true;
   }
 }
+
+// Button zum Task erstellen
+// Task Bearbeitung ermöglichen (befüllen / speichern)

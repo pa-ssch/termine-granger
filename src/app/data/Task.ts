@@ -7,14 +7,13 @@ export class Task {
   duration?: number;
   deadLineTime?: Date;
   priority?: number;
-  isVisible?: boolean;
+  //isVisible?: boolean;
   isBlocker: boolean;
   isDone: boolean;
 
-  group?: string;
-  ParentId?: number;
+  parentId?: number;
+
   extSourceLink?: string;
-  reminder?: Date[];
 
   get taskId(): number {
     return this.id;

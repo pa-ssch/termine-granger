@@ -1,17 +1,17 @@
 <ion-item-sliding>
   <ion-item
-    [routerLink]="hasChilds ? ['/list/', tId] : ''"
+    [routerLink]="childCount > 0 ? ['/list/', task.taskId] : ''"
     routerDirection="forward"
-    [detail]="hasChilds"
+    [detail]="childCount > 0"
   >
     <ion-checkbox
-      [indeterminate]="hasChilds"
-      [class]="hasChilds ? 'readonly' : ''"
-      [color]="hasChilds ? 'medium' : 'primary'"
+      [indeterminate]="childCount > 0"
+      [class]="childCount > 0 ? 'readonly' : ''"
+      [color]="childCount > 0 ? 'medium' : 'primary'"
     ></ion-checkbox>
 
-    <ion-label padding-start>{{ tId }}</ion-label>
-    <ion-badge item-end *ngIf="hasChilds">42</ion-badge>
+    <ion-label padding-start>{{ task.title }}</ion-label>
+    <ion-badge item-end *ngIf="childCount > 0">{{ childCount }}</ion-badge>
   </ion-item>
 
   <ion-item-options side="start">
@@ -19,8 +19,8 @@
   </ion-item-options>
   <ion-item-options side="end">
     <ion-item-option
-      [hidden]="hasChilds"
-      [routerLink]="['/input/', tId]"
+      [hidden]="childCount > 0"
+      [routerLink]="['/input/', task.taskId]"
       routerDirection="forward"
       slot="icon-only"
     >

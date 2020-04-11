@@ -1,45 +1,62 @@
 import { Injectable } from "@angular/core";
+import { Task } from "./Task";
+import { Reminder } from "./Reminder";
+import { NumericValueAccessor } from "@ionic/angular";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class DataService {
-  private IndxDb: IDBFactory;
+  private static instance: DataService;
+
+  private indxDb: IDBFactory;
   private db: IDBDatabase;
   private static readonly DB_NAME = "TG_DB";
   private openReq: IDBOpenDBRequest;
 
-  constructor() {
-    this.IndxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
+  private constructor() {
+    this.indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
 
     // Open & Init DB
-    this.openReq = this.IndxDb.open(DataService.DB_NAME, 1);
+    this.openReq = this.indxDb.open(DataService.DB_NAME, 1);
     this.openReq.addEventListener(
       "success",
       () => (this.db = this.openReq.result)
     );
     this.openReq.addEventListener("upgradeneeded", () =>
-      this.CreateOrUpgrade()
+      this.createOrUpgrade()
     );
     this.openReq.addEventListener("error", () =>
       console.log("[onerror]", this.openReq.error)
     );
   }
-  private CreateOrUpgrade(): any {
+
+  static getInstance(): DataService {
+    return this.instance ?? (this.instance = new DataService());
+  }
+
+  private createOrUpgrade(): any {
     // Upgrade oder neue DB benötigt
 
     var db = this.openReq.result;
-    var store = db.createObjectStore("PERSON", {
+    var ts = db.createObjectStore("TASK", {
       keyPath: "id",
-      autoIncrement: true
+      autoIncrement: true,
     });
-    store.createIndex("IX_ID_UNIQUE", "id", { unique: true });
+    ts.createIndex("IX_TASK_ID_UNIQUE", "id", { unique: true });
+    ts.createIndex("IX_TASK_START_DATE", ["parentId", "isDone", "startTime"]);
+    // ts.createIndex("IX_TASK_EXT_SRC", "extSourceLink");
+    // evtl. isBlocker & prio
 
-    // Parent als hierarchical key
-    // An Task ist Gruppe (Indizierter String, nicht unique. Gemeinsam mit Parent ist es unique)
-    // Ext source als Index direkt an Task - nicht unique
-    // Reminder liste direkt an dem Task (eigentlich Datum liste)
-    // Reminder datum (wegen sortierung indiziert - möglich?)
+    var rs = db.createObjectStore("REMINDER", {
+      keyPath: "id",
+      autoIncrement: true,
+    });
+    rs.createIndex("IX_REMINDER_ID_UNIQUE", "id", { unique: true });
+    rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
+
+    // https://stackoverflow.com/questions/12084177/in-indexeddb-is-there-a-way-to-make-a-sorted-compound-query
+    // https://itnext.io/searching-in-your-indexeddb-database-d7cbf202a17
   }
 
   // CloseDB() {
@@ -48,47 +65,71 @@ export class DataService {
   //   // this.OpenInitDB();
   // }
 
-  /** Ändert eine bestehende Person oder fügt eine neue hinzu */
-  UpdatePerson(person: any) {
+  /** Ändert eine bestehende Aufgabe oder fügt eine neue hinzu */
+  updateTask(task: Task, reminder?: Reminder[]) {
     if (this.openReq.readyState !== "done")
       return this.openReq.addEventListener("success", () =>
-        this.UpdatePerson(person)
+        this.updateTask(task, reminder)
       );
-    var transaction = this.db.transaction("PERSON", "readwrite");
+    var transaction = this.db.transaction(["TASK", "REMINDER"], "readwrite");
     // transaction.onerror = function(event) {};
     // transaction.onabort = function(event) {};
     // transaction.oncomplete = function(event) {};
 
-    var personStore = transaction.objectStore("PERSON");
+    var taskStore = transaction.objectStore("TASK");
+    var reminderStore = transaction.objectStore("REMINDER");
+    // let req = personStore.delete(task.id);
+    // req.onerror = function(event) {};
+    // req.onsuccess = function(event) {};
 
-    if (person.value > 0 && person.id !== null) {
-      let req = personStore.delete(person.id);
+    let taskReq = taskStore.put(task);
+    // req.onerror = function(event) {};
+    taskReq.addEventListener("success", () => task.UpdateId(taskReq));
+
+    reminder.forEach((r) => {
+      r.taskId = task.taskId;
+      let reminderReq = reminderStore.put(r);
       // req.onerror = function(event) {};
-      // req.onsuccess = function(event) {};
-    } else if (person.value <= 0) {
-      let req = personStore.put(person);
-      // req.onerror = function(event) {};
-      req.addEventListener("success", () => person.UpdateId(req));
-    }
+      reminderReq.addEventListener("success", () => r.UpdateId(reminderReq));
+    });
   }
 
-  /** Liefert alle Personen in der Datenbank */
-  GetAllPerson(onsuccessfunction: (result: any[]) => void): any {
+  /** Comment */
+  getTasks(
+    parentId: number,
+    onsuccessfunction: (result: Task[]) => void,
+    skip?: number,
+    count?: number
+  ): any {
     if (this.openReq.readyState !== "done")
       return this.openReq.addEventListener("success", () =>
-        this.GetAllPerson(onsuccessfunction)
+        this.getTasks(parentId, onsuccessfunction, skip, count)
       );
 
-    var transaction = this.db.transaction("PERSON");
+    var req = this.db
+      .transaction("TASK", "readonly")
+      .objectStore("TASK")
+      .index("IX_TASK_START_DATE")
+      .openCursor(IDBKeyRange.only([parentId, false]));
     // transaction.oncomplete = function(event) {};
     // transaction.onerror = function(event) {};
     // transaction.onabort = function(event) {};
 
-    var request = transaction.objectStore("PERSON").getAll();
+    var retval: Task[];
 
-    request.onsuccess = function(event) {
-      onsuccessfunction(this.result);
+    req.onsuccess = function (event) {
+      this.result.advance(skip);
+      skip = 0;
+
+      if (this.result && count > 0) {
+        retval.push(this.result.value);
+        count--;
+        this.result.continue();
+      } else {
+        onsuccessfunction(retval);
+      }
     };
-    // request.onerror = function() {};
+
+    req.onerror = function () {};
   }
 }

@@ -6,7 +6,7 @@
     <ion-title>Eingabe</ion-title>
     <!-- gruppe (label) evtl. als Chip -->
     <ion-buttons slot="end">
-      <ion-button slot="end">
+      <ion-button slot="end" (click)="saveAndClose()" [class.button-disabled]="!task.title">
         <ion-icon slot="icon-only" name="save"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -15,17 +15,12 @@
 
 <ion-content>
   <ion-card
-    ><ion-input
-      placeholder="Titel"
-      class="input-large"
-      value="{{tId}}"
-    ></ion-input>
+    ><ion-input placeholder="Titel" class="input-large" [(ngModel)]="task.title"></ion-input>
   </ion-card>
 
   <ion-card>
     <ion-item>
       <ion-label>Zeitangaben</ion-label>
-      <ion-toggle slot="end">View</ion-toggle>
     </ion-item>
 
     <ion-card-content>
@@ -35,41 +30,25 @@
         <!-- duration?: nummer + einheit (Stunden, Tage, w, m, j); -->
       </ion-item>
 
-      <ion-item no-padding lines="none">
-        <ion-icon name="golf" slot="start"></ion-icon>
-        <ion-datetime
-          class="leftAlign"
-          no-padding
-          displayFormat="DD.MM.YYYY"
-          min="2005"
-          max="2016"
-          value="2008-09-02"
-        ></ion-datetime>
+      <app-datetime
+        [min]="task.startTime?.toISOString()"
+        [time]="task.deadLineTime?.toISOString()"
+        placeholder="Deadline"
+        [pickerOptions]="getDeadlinePickerOptions()"
+        icon="golf"
+      ></app-datetime>
 
-        <ion-datetime
-          slot="end"
-          displayFormat="HH:mm"
-          value="12:00"
-        ></ion-datetime>
-      </ion-item>
-
-      <ion-item no-padding lines="none">
-        <ion-icon name="play" slot="start"></ion-icon>
-        <ion-datetime
-          class="leftAlign"
-          no-padding
-          displayFormat="DD.MM.YYYY"
-          min="2005"
-          max="2016"
-          value="2008-09-02"
-        ></ion-datetime>
-
-        <ion-datetime
-          slot="end"
-          displayFormat="HH:mm"
-          value="12:00"
-        ></ion-datetime>
-      </ion-item>
+      <app-datetime
+        [max]="task.deadLineTime?.toISOString()"
+        [time]="task.startTime?.toISOString()"
+        placeholder="Start"
+        [pickerOptions]="getStartdatePickerOptions()"
+        icon="play"
+      ></app-datetime>
+      <!-- 
+        app-datetime soll wie startadtum klickbar sein (gesamtes element) (liegt an button hinten)
+        & linien entfernbar machen
+        -->
     </ion-card-content>
   </ion-card>
 
@@ -78,11 +57,13 @@
       <ion-label>Erinnerungen</ion-label>
     </ion-item>
     <ion-card-content>
-      <app-reminder
+      <app-datetime
         *ngFor="let r of reminderList"
-        [time]="r.time?.toISOString()"
-        (update)="updateReminder($event, r)"
-      ></app-reminder>
+        icon="alarm"
+        [time]="r.reminderTime?.toISOString()"
+        [pickerOptions]="getReminderPickerOptions(r)"
+        placeholder="Add..."
+      ></app-datetime>
     </ion-card-content>
   </ion-card>
 
@@ -108,11 +89,7 @@
 
       <ion-item no-padding lines="full">
         <ion-icon name="reader" slot="start"></ion-icon>
-        <ion-textarea
-          auto-grow="true"
-          rows="1"
-          placeholder="Hier Infos eingeben"
-        ></ion-textarea>
+        <ion-textarea auto-grow="true" rows="1" placeholder="Hier Infos eingeben"></ion-textarea>
       </ion-item>
 
       <ion-item no-padding lines="none">
@@ -135,15 +112,6 @@
   </ion-card>
 
   <!-- 
-Datenmodell anpassen
--> Gruppe nicht extra sondern string an task
--> wenn man selbst nix hat, aber parent, dann ist parent gruppe (name von parent oder gruppenname)
-termine ohne datum reorderbar? 
-
-
-
-todo ionic 5: Padding left bei Android liste, ios titel-input und beiden time-dropdowns 
-
-vlt grid?
+    todo ionic 5: Padding left bei Android liste, ios titel-input und beiden time-dropdowns 
  -->
 </ion-content>

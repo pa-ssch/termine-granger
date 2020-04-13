@@ -1,40 +1,66 @@
+import { DatetimeComponent } from "./../../_components/datetime/datetime.component";
+import { DataService } from "./../../data/data.service";
+import { Task } from "./../../data/Task";
 import { Component, OnInit, EventEmitter } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { Reminder } from "src/app/data/Reminder";
+import { NavController } from "@ionic/angular";
 
 @Component({
   selector: "app-input",
   templateUrl: "./input.page.html",
-  styleUrls: ["./input.page.scss"]
+  styleUrls: ["./input.page.scss"],
 })
 export class InputPage implements OnInit {
-  tId: number;
-  reminderList: Date[];
-  constructor(private activatedRoute: ActivatedRoute) {}
+  task: Task;
+  reminderList: Reminder[];
+
+  constructor(private activatedRoute: ActivatedRoute, private navCtrl: NavController) {}
 
   ngOnInit() {
-    this.tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
+    var tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
+    this.reminderList = [];
+    if (tId > 0) {
+      DataService.loadMe().getTask(tId, (t) => (this.task = t));
+      DataService.loadMe().getReminder(tId, (r) => (this.reminderList = r));
+    } else {
+      // neu erstellen
+      this.task = new Task();
+      this.task.parentId = +this.activatedRoute.snapshot.paramMap.get("parentTaskId");
+    }
 
-    // var r1 = new Reminder();
-    // r1.taskId = this.tId;
-    // r1.time = new Date();
-    // var r2 = new Reminder();
-    // r2.taskId = this.tId;
-    // r2.time = new Date();
-
-    // this.reminderList = [r1, r2, this.getNewReminder()];
+    // Ein neuer leerer Reminder ist benötigt
+    this.reminderList.push(new Reminder());
   }
 
-  updateReminder(event: EventEmitter<string>, time: Date) {
-    if (event) {
-      if (!time) {
+  saveAndClose() {
+    DataService.loadMe().updateTask(this.task, this.reminderList);
+    this.navCtrl.back();
+  }
+
+  getReminderPickerOptions(reminder: Reminder) {
+    return DatetimeComponent.getPickerOptions(
+      (d: any) => {
         // Es wurde ein neuer Reminder erstellt -> Ein neuer leerer Reminder ist benötigt
-        this.reminderList.push(new Date());
-      }
-      // Datum ändern
-      time = new Date(event + "");
-    } else if (time) {
-      // Reminder löschen. Objekt vergleich, falls zwei gleiche Daten vorhanden sind.
-      this.reminderList = this.reminderList.filter(t => t !== time);
-    }
+        if (!reminder.reminderTime) this.reminderList.push(new Reminder());
+        // Datum ändern
+        reminder.reminderTime = DatetimeComponent.getDateFromPickerobject(d);
+      },
+      () => (this.reminderList = this.reminderList.filter((r) => r !== reminder))
+    );
+  }
+
+  getStartdatePickerOptions() {
+    return DatetimeComponent.getPickerOptions(
+      (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerobject(d)),
+      () => (this.task.startTime = null)
+    );
+  }
+
+  getDeadlinePickerOptions() {
+    return DatetimeComponent.getPickerOptions(
+      (d: any) => (this.task.deadLineTime = DatetimeComponent.getDateFromPickerobject(d)),
+      () => (this.task.deadLineTime = null)
+    );
   }
 }

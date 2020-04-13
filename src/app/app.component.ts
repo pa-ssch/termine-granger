@@ -3,18 +3,15 @@ import { Component } from "@angular/core";
 import { Platform } from "@ionic/angular";
 import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
+import { DataService } from "./data/data.service";
 
 @Component({
   selector: "app-root",
   templateUrl: "app.component.html",
-  styleUrls: ["app.component.scss"]
+  styleUrls: ["app.component.scss"],
 })
 export class AppComponent {
-  constructor(
-    private platform: Platform,
-    private splashScreen: SplashScreen,
-    private statusBar: StatusBar
-  ) {
+  constructor(private platform: Platform, private splashScreen: SplashScreen, private statusBar: StatusBar) {
     this.initializeApp();
   }
 
@@ -22,7 +19,8 @@ export class AppComponent {
     this.platform.ready().then(() => {
       this.statusBar.styleDefault();
       this.splashScreen.hide();
-      // db verbinden... -> wenn erstellt wird --> tutorial
+
+      //DataService.loadMe(); // --> wenn erstellt wird: tutorial
     });
   }
 }

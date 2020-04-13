@@ -8,13 +8,13 @@
   <app-task-list></app-task-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed" edge>
-    <ion-fab-button>
+    <ion-fab-button [routerLink]="['/input/', 0, 0]" routerDirection="forward">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-    <ion-fab-list side="top">
+    <!-- <ion-fab-list side="top">
       <ion-fab-button><ion-icon name="settings"></ion-icon></ion-fab-button>
       <ion-fab-button><ion-icon name="apps"></ion-icon></ion-fab-button>
-    </ion-fab-list>
+    </ion-fab-list> -->
   </ion-fab>
 </ion-content>
 <ion-footer>

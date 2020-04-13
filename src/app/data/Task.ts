@@ -3,13 +3,30 @@ export class Task {
   title: string;
   description?: string;
 
-  startTime?: Date;
+  private _startTime?: string;
+
+  get startTime(): Date {
+    return this._startTime ? new Date(this._startTime) : null;
+  }
+  set startTime(startTime: Date) {
+    if (startTime) this._startTime = startTime.toISOString();
+  }
+
   duration?: number;
-  deadLineTime?: Date;
+  private _deadLineTime?: string;
+
+  get deadLineTime() {
+    return this._deadLineTime ? new Date(this._deadLineTime) : null;
+  }
+
+  set deadLineTime(deadLineTime: Date) {
+    if (deadLineTime) this._deadLineTime = deadLineTime?.toISOString();
+  }
+
   priority?: number;
   //isVisible?: boolean;
   isBlocker: boolean;
-  isDone: boolean;
+  isDone: boolean; // sollte evtl datum sein...
 
   parentId?: number;
 

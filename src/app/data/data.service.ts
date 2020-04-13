@@ -19,19 +19,12 @@ export class DataService {
 
     // Open & Init DB
     this.openReq = this.indxDb.open(DataService.DB_NAME, 1);
-    this.openReq.addEventListener(
-      "success",
-      () => (this.db = this.openReq.result)
-    );
-    this.openReq.addEventListener("upgradeneeded", () =>
-      this.createOrUpgrade()
-    );
-    this.openReq.addEventListener("error", () =>
-      console.log("[onerror]", this.openReq.error)
-    );
+    this.openReq.addEventListener("success", () => (this.db = this.openReq.result));
+    this.openReq.addEventListener("upgradeneeded", () => this.createOrUpgrade());
+    this.openReq.addEventListener("error", () => console.log("[onerror]", this.openReq.error));
   }
 
-  static getInstance(): DataService {
+  static loadMe(): DataService {
     return this.instance ?? (this.instance = new DataService());
   }
 
@@ -53,7 +46,7 @@ export class DataService {
       autoIncrement: true,
     });
     rs.createIndex("IX_REMINDER_ID_UNIQUE", "id", { unique: true });
-    rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
+    // rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
 
     // https://stackoverflow.com/questions/12084177/in-indexeddb-is-there-a-way-to-make-a-sorted-compound-query
     // https://itnext.io/searching-in-your-indexeddb-database-d7cbf202a17
@@ -68,9 +61,7 @@ export class DataService {
   /** Ändert eine bestehende Aufgabe oder fügt eine neue hinzu */
   updateTask(task: Task, reminder?: Reminder[]) {
     if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () =>
-        this.updateTask(task, reminder)
-      );
+      return this.openReq.addEventListener("success", () => this.updateTask(task, reminder));
     var transaction = this.db.transaction(["TASK", "REMINDER"], "readwrite");
     // transaction.onerror = function(event) {};
     // transaction.onabort = function(event) {};
@@ -86,6 +77,11 @@ export class DataService {
     // req.onerror = function(event) {};
     taskReq.addEventListener("success", () => task.UpdateId(taskReq));
 
+    //
+    // Reminder mit cursor updaten, damit auch gelöscht wird!
+    //
+    //
+
     reminder.forEach((r) => {
       r.taskId = task.taskId;
       let reminderReq = reminderStore.put(r);
@@ -100,17 +96,25 @@ export class DataService {
     onsuccessfunction: (result: Task[]) => void,
     skip?: number,
     count?: number
-  ): any {
+  ): void {
     if (this.openReq.readyState !== "done")
       return this.openReq.addEventListener("success", () =>
         this.getTasks(parentId, onsuccessfunction, skip, count)
       );
 
+    // das geht nicht, wegen
+    // https://stackoverflow.com/questions/12084177/in-indexeddb-is-there-a-way-to-make-a-sorted-compound-query
+    // oder vlt. doch, wegen
+    // https://stackoverflow.com/questions/16501459/javascript-searching-indexeddb-using-multiple-indexes
+    var lowerBound = [parentId, false, new Date(1970)];
+    var upperBound = [parentId, false, 200, new Date(2200)];
+    var range = IDBKeyRange.bound(lowerBound, upperBound);
+
     var req = this.db
       .transaction("TASK", "readonly")
       .objectStore("TASK")
       .index("IX_TASK_START_DATE")
-      .openCursor(IDBKeyRange.only([parentId, false]));
+      .openCursor(range);
     // transaction.oncomplete = function(event) {};
     // transaction.onerror = function(event) {};
     // transaction.onabort = function(event) {};
@@ -130,6 +134,57 @@ export class DataService {
       }
     };
 
+    // req.onerror = function () {};
+  }
+
+  getChildrenCount(parentId: number, onsuccessfunction: (t: number) => number) {
+    if (this.openReq.readyState !== "done")
+      return this.openReq.addEventListener("success", () =>
+        this.getChildrenCount(parentId, onsuccessfunction)
+      );
+
+    var req = this.db
+      .transaction("TASK", "readonly")
+      .objectStore("TASK")
+      .index("IX_TASK_START_DATE")
+      .count(IDBKeyRange.only([parentId, false]));
+    // transaction.oncomplete = function(event) {};
+    // transaction.onerror = function(event) {};
+    // transaction.onabort = function(event) {};
+
+    req.onsuccess = (e) => onsuccessfunction(req.result);
+
     req.onerror = function () {};
+  }
+
+  getTask(tId: number, onsuccessfunction: (t: Task) => Task) {
+    throw new Error("Method not implemented.");
+  }
+
+  getReminder(tId: number, onsuccessfunction: (r: Reminder[]) => Reminder[]) {
+    if (this.openReq.readyState !== "done")
+      return this.openReq.addEventListener("success", () => this.getReminder(tId, onsuccessfunction));
+
+    var req = this.db
+      .transaction("REMINDER", "readonly")
+      .objectStore("REMINDER")
+      .index("IX_REMINDER_ID_UNIQUE")
+      .openCursor(IDBKeyRange.only([tId, false]));
+    // transaction.oncomplete = function(event) {};
+    // transaction.onerror = function(event) {};
+    // transaction.onabort = function(event) {};
+
+    var retval: Reminder[];
+
+    req.onsuccess = function (event) {
+      if (this.result) {
+        retval.push(this.result.value);
+        this.result.continue();
+      } else {
+        onsuccessfunction(retval);
+      }
+    };
+
+    // req.onerror = function () {};
   }
 }

@@ -5,31 +5,40 @@ const routes: Routes = [
   { path: "", redirectTo: "home", pathMatch: "full" },
   {
     path: "home",
-    loadChildren: () => import("./home/home.module").then(m => m.HomePageModule)
+    loadChildren: () =>
+      import("./home/home.module").then((m) => m.HomePageModule),
   },
   {
     path: "tutorial",
     loadChildren: () =>
       import("./_pages/tutorial/tutorial.module").then(
-        m => m.TutorialPageModule
-      )
+        (m) => m.TutorialPageModule
+      ),
   },
   {
+    // Eingabeseite für konkreten task öffnen
     path: "input/:taskId",
     loadChildren: () =>
-      import("./_pages/input/input.module").then(m => m.InputPageModule)
+      import("./_pages/input/input.module").then((m) => m.InputPageModule),
   },
   {
+    // Sub-Task-Liste zu einem Parent anzeigen
     path: "list/:taskId",
     loadChildren: () =>
-      import("./_pages/list/list.module").then(m => m.ListPageModule)
-  }
+      import("./_pages/list/list.module").then((m) => m.ListPageModule),
+  },
+  {
+    // Eingabeseite öffnen, mit Angabe des Parents (falls der zu bearbeitende Task noch nicht existiert)
+    path: "input/:taskId/:parentTaskId",
+    loadChildren: () =>
+      import("./_pages/input/input.module").then((m) => m.InputPageModule),
+  },
 ];
 
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}

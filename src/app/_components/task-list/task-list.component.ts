@@ -18,7 +18,7 @@ export class TaskListComponent implements OnInit {
   constructor() {}
 
   loadData(event?: any) {
-    DataService.getInstance().getTasks(
+    DataService.loadMe().getTasks(
       this.tId,
       (taskList) => {
         taskList.forEach((task) => this.taskList.push(task));
@@ -32,5 +32,4 @@ export class TaskListComponent implements OnInit {
   }
 }
 
-// Button zum Task erstellen
 // Task Bearbeitung ermöglichen (befüllen / speichern)

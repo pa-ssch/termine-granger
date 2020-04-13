@@ -1,13 +1,15 @@
 <ion-item no-padding lines="full">
-  <ion-icon name="alarm" slot="start"></ion-icon>
+  <ion-icon [name]="icon" slot="start"></ion-icon>
 
   <ion-datetime
-    placeholder="hinzufügen..."
+    [placeholder]="placeholder"
     class="leftAlign"
     displayFormat="DD.MM.YYYY hh:mm"
     no-padding
-    [(ngModel)]="time"
-    (ionChange)="dateChanged()"
+    [value]="time"
+    [pickerOptions]="pickerOptions"
+    [min]="getMin()"
+    [max]="getMax()"
   ></ion-datetime>
 
   <!--
@@ -16,13 +18,7 @@
     und beim hinzufügen eines Zeitwertes unter dem DatetimePicker liegt
     -> Button könnte nichtmehr geklickt werden
   -->
-  <ion-button
-    [hidden]="!time"
-    item-right
-    clear
-    (click)="remove($event)"
-    slot="end"
-  >
+  <ion-button [hidden]="!time" item-right clear (click)="remove()" slot="end">
     <ion-icon name="close" size="small"></ion-icon>
   </ion-button>
 </ion-item>

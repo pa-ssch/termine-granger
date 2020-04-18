@@ -18,6 +18,7 @@ export class InputPage implements OnInit {
   constructor(private activatedRoute: ActivatedRoute, private navCtrl: NavController) {}
 
   ngOnInit() {
+    this.task = new Task();
     var tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
     this.reminderList = [];
     if (tId > 0) {
@@ -25,7 +26,6 @@ export class InputPage implements OnInit {
       DataService.loadMe().getReminder(tId, (r) => (this.reminderList = r));
     } else {
       // neu erstellen
-      this.task = new Task();
       this.task.parentId = +this.activatedRoute.snapshot.paramMap.get("parentTaskId");
     }
 

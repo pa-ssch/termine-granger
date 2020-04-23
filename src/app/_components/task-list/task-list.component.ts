@@ -31,5 +31,3 @@ export class TaskListComponent implements OnInit {
     event?.target.complete();
   }
 }
-
-// Task Bearbeitung ermöglichen (befüllen / speichern)

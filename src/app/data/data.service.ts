@@ -1,20 +1,47 @@
 import { Injectable } from "@angular/core";
 import { Task } from "./Task";
 import { Reminder } from "./Reminder";
-import { NumericValueAccessor } from "@ionic/angular";
 
 @Injectable({
   providedIn: "root",
 })
 export class DataService {
   private static instance: DataService;
-
   private indxDb: IDBFactory;
   private db: IDBDatabase;
   private static readonly DB_NAME = "TG_DB";
   private openReq: IDBOpenDBRequest;
 
-  private constructor() {
+  //#region promises
+  private dbReadyPromise(timeout: number = 0) {
+    console.log(timeout === 0 ? "check db connection" : "waiting for db connection...");
+    return new Promise((res) =>
+      setTimeout(() => {
+        if (this.openReq?.readyState !== "done") {
+          // Wenn beim 1. Versuch die DB noch nicht ready ist, dann zwischen jedem weiteren Versuch 100ms warten.
+          this.dbReadyPromise(100);
+        } else {
+          console.log("db is connected");
+          res();
+        }
+      }, timeout)
+    );
+  }
+
+  private requestPromise<T>(req: IDBRequest) {
+    return new Promise<T>((res, rej) => {
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => rej(req.error);
+    });
+  }
+
+  //#endregion promises
+
+  //#region openData
+  private constructor() {}
+
+  private open() {
+    this.dbReadyPromise();
     this.indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
 
     // Open & Init DB
@@ -25,7 +52,13 @@ export class DataService {
   }
 
   static loadMe(): DataService {
-    return this.instance ?? (this.instance = new DataService());
+    if (this.instance) {
+      return this.instance;
+    } else {
+      this.instance = new DataService();
+      this.instance.open();
+      return this.instance;
+    }
   }
 
   private createOrUpgrade(): any {
@@ -58,6 +91,8 @@ export class DataService {
   //   // this.OpenInitDB();
   // }
 
+  //#endregion openData
+
   /** Ändert eine bestehende Aufgabe oder fügt eine neue hinzu */
   updateTask(task: Task, reminder?: Reminder[]) {
     if (this.openReq.readyState !== "done")
@@ -73,9 +108,7 @@ export class DataService {
     // req.onerror = function(event) {};
     // req.onsuccess = function(event) {};
 
-    let taskReq = taskStore.put(task);
-    // req.onerror = function(event) {};
-    taskReq.addEventListener("success", () => (task.taskId = +taskReq.result.valueOf()));
+    this.requestPromise(taskStore.put(task)).then((res) => (task.taskId = +res.valueOf()));
 
     //
     // Reminder mit cursor updaten, damit auch gelöscht wird!
@@ -102,15 +135,14 @@ export class DataService {
     // oder vlt. doch, wegen
     // https://stackoverflow.com/questions/16501459/javascript-searching-indexeddb-using-multiple-indexes
 
-    // var lowerBound = [0, null, new Date(1970).toISOString()];
-    // var upperBound = [0, null, new Date(2200).toISOString()];
-    // var range = IDBKeyRange.bound(lowerBound, upperBound);
+    // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
+    var allTopTasksRangeSorted = IDBKeyRange.bound([0, "", ""], [0, "", "a"]);
 
     var req = this.db
       .transaction("TASK", "readonly")
       .objectStore("TASK")
-      // .index("IX_TASK_START_DATE")
-      .openCursor(/*range*/);
+      .index("IX_TASK_START_DATE")
+      .openCursor(allTopTasksRangeSorted);
 
     // transaction.oncomplete = function(event) {};
     // transaction.onerror = function(event) {};
@@ -136,61 +168,34 @@ export class DataService {
     // req.onerror = function () {};
   }
 
-  getChildrenCount(parentId: number, onsuccessfunction: (t: number) => number) {
-    if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () =>
-        this.getChildrenCount(parentId, onsuccessfunction)
-      );
+  async getChildrenCount(parentId: number): Promise<number> {
+    await this.dbReadyPromise();
 
-    if (!parentId) parentId = 0;
-
-    var req = this.db
-      .transaction("TASK", "readonly")
-      .objectStore("TASK")
-      .index("IX_TASK_START_DATE")
-      .count(IDBKeyRange.only([parentId, ""]));
-    // transaction.oncomplete = function(event) {};
-    // transaction.onerror = function(event) {};
-    // transaction.onabort = function(event) {};
-
-    req.onsuccess = () => onsuccessfunction(req.result);
-
-    req.onerror = function () {};
+    return this.requestPromise<number>(
+      this.db
+        .transaction("TASK", "readonly")
+        .objectStore("TASK")
+        .index("IX_TASK_START_DATE")
+        // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
+        .count(IDBKeyRange.bound([0, "", ""], [0, "", "a"]))
+    );
   }
 
-  getTask(tId: number, onsuccessfunction: (t: Task) => Task) {
-    if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () => this.getTask(tId, onsuccessfunction));
-
-    var req = this.db.transaction("TASK", "readonly").objectStore("TASK").get(tId);
-
-    req.onsuccess = () => onsuccessfunction(req.result);
+  async getTask(tId: number): Promise<Task> {
+    await this.dbReadyPromise();
+    return this.requestPromise<Task>(this.db.transaction("TASK", "readonly").objectStore("TASK").get(tId));
   }
 
-  getReminder(tId: number, onsuccessfunction: (r: Reminder[]) => Reminder[]) {
-    if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () => this.getReminder(tId, onsuccessfunction));
+  async getReminder(tId: number): Promise<Reminder[]> {
+    await this.dbReadyPromise();
 
-    var req = this.db
-      .transaction("REMINDER", "readonly")
-      .objectStore("REMINDER")
-      .index("IX_REMINDER_ID_UNIQUE")
-      .openCursor(IDBKeyRange.only([tId]));
-    // transaction.oncomplete = function(event) {};
-    // transaction.onerror = function(event) {};
-    // transaction.onabort = function(event) {};
-
-    var retval: Reminder[];
-
-    req.onsuccess = function (event) {
-      if (this.result) {
-        retval.push(this.result.value);
-        this.result.continue();
-      } else {
-        onsuccessfunction(retval);
-      }
-    };
-
-    // req.onerror = function () {};
+    return this.requestPromise<Reminder[]>(
+      this.db
+        .transaction("REMINDER", "readonly")
+        .objectStore("REMINDER")
+        .index("IX_REMINDER_DATE")
+        // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
+        .getAll(IDBKeyRange.bound([tId, ""], [tId, "a"]))
+    );
   }
 }

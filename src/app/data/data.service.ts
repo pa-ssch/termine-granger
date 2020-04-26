@@ -12,6 +12,16 @@ export class DataService {
   private static readonly DB_NAME = "TG_DB";
   private openReq: IDBOpenDBRequest;
 
+  private undoneTaskKeyRange(tId: number): IDBKeyRange {
+    // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
+    return IDBKeyRange.bound([tId, "", ""], [tId, "", "a"]);
+  }
+
+  private reminderForTaskKeyRange(tId: number): IDBKeyRange {
+    // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
+    return IDBKeyRange.bound([tId, ""], [tId, "a"]);
+  }
+
   //#region promises
   private dbReadyPromise(timeout: number = 0) {
     console.log(timeout === 0 ? "check db connection" : "waiting for db connection...");
@@ -80,92 +90,66 @@ export class DataService {
     });
     rs.createIndex("IX_REMINDER_ID_UNIQUE", "reminderId", { unique: true });
     rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
-
-    // https://stackoverflow.com/questions/12084177/in-indexeddb-is-there-a-way-to-make-a-sorted-compound-query
-    // https://itnext.io/searching-in-your-indexeddb-database-d7cbf202a17
   }
-
-  // CloseDB() {
-  //   this.db.close();
-  //   // this.IndxDb.deleteDatabase(DataService.DB_NAME);
-  //   // this.OpenInitDB();
-  // }
-
   //#endregion openData
 
   /** Ändert eine bestehende Aufgabe oder fügt eine neue hinzu */
-  updateTask(task: Task, reminder?: Reminder[]) {
-    if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () => this.updateTask(task, reminder));
+  async updateTask(task: Task, reminder?: Reminder[]) {
+    await this.dbReadyPromise();
+
     var transaction = this.db.transaction(["TASK", "REMINDER"], "readwrite");
-    // transaction.onerror = function(event) {};
-    // transaction.onabort = function(event) {};
-    // transaction.oncomplete = function(event) {};
+    var ts = transaction.objectStore("TASK");
+    var rs = transaction.objectStore("REMINDER");
 
-    var taskStore = transaction.objectStore("TASK");
-    var reminderStore = transaction.objectStore("REMINDER");
-    // let req = personStore.delete(task.id);
-    // req.onerror = function(event) {};
-    // req.onsuccess = function(event) {};
+    this.requestPromise(ts.put(task)).then((res) => {
+      task.taskId = +res.valueOf();
 
-    this.requestPromise(taskStore.put(task)).then((res) => (task.taskId = +res.valueOf()));
+      // Reminder updaten
+      var req = rs.index("IX_REMINDER_DATE").getAll(this.reminderForTaskKeyRange(task.taskId));
+      req.onsuccess = function (event) {
+        // Delete
+        var deleted: Reminder[] = this.result.filter((r) => !reminder.includes(r));
+        deleted.forEach((r) => rs.delete(r.reminderId));
 
-    //
-    // Reminder mit cursor updaten, damit auch gelöscht wird!
-    //
-    //
-
-    reminder.forEach((r) => {
-      r.taskId = task.taskId;
-      let reminderReq = reminderStore.put(r);
-      // req.onerror = function(event) {};
-      reminderReq.addEventListener("success", () => (r.reminderId = +reminderReq.result.valueOf()));
+        // Insert / Update
+        reminder.forEach((r) => {
+          r.taskId = task.taskId;
+          let reminderReq = rs.put(r);
+          reminderReq.addEventListener("success", () => (r.reminderId = +reminderReq.result.valueOf()));
+        });
+      };
     });
   }
 
   /** Comment */
-  getTasks(parentId: number, onsuccessfunction: (result: Task[]) => void, skip?: number, cnt?: number): void {
-    if (this.openReq.readyState !== "done")
-      return this.openReq.addEventListener("success", () =>
-        this.getTasks(parentId, onsuccessfunction, skip, cnt)
-      );
-
-    // das geht nicht, wegen
-    // https://stackoverflow.com/questions/12084177/in-indexeddb-is-there-a-way-to-make-a-sorted-compound-query
-    // oder vlt. doch, wegen
-    // https://stackoverflow.com/questions/16501459/javascript-searching-indexeddb-using-multiple-indexes
-
-    // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
-    var allTopTasksRangeSorted = IDBKeyRange.bound([0, "", ""], [0, "", "a"]);
+  async getTasks(parentId: number, skip?: number, cnt?: number): Promise<Task[]> {
+    await this.dbReadyPromise();
 
     var req = this.db
       .transaction("TASK", "readonly")
       .objectStore("TASK")
       .index("IX_TASK_START_DATE")
-      .openCursor(allTopTasksRangeSorted);
-
-    // transaction.oncomplete = function(event) {};
-    // transaction.onerror = function(event) {};
-    // transaction.onabort = function(event) {};
+      .openCursor(this.undoneTaskKeyRange(parentId));
 
     var retval: Task[] = [];
 
-    req.onsuccess = function (event) {
-      if (skip > 0) {
-        this.result.advance(skip);
-        skip = 0;
-      }
+    return await new Promise<Task[]>((res, rej) => {
+      req.onsuccess = () => {
+        if (skip > 0) {
+          req.result.advance(skip);
+          skip = 0;
+        }
 
-      if (this.result && cnt > 0) {
-        retval.push(this.result.value);
-        cnt--;
-        this.result.continue();
-      } else {
-        onsuccessfunction(retval);
-      }
-    };
+        if (req.result && cnt > 0) {
+          retval.push(req.result.value);
+          cnt--;
+          req.result.continue();
+        }
 
-    // req.onerror = function () {};
+        if (cnt == 0 || !req.result) res(retval);
+      };
+      req.onerror = () => rej(req.error);
+    });
   }
 
   async getChildrenCount(parentId: number): Promise<number> {
@@ -176,8 +160,7 @@ export class DataService {
         .transaction("TASK", "readonly")
         .objectStore("TASK")
         .index("IX_TASK_START_DATE")
-        // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
-        .count(IDBKeyRange.bound([0, "", ""], [0, "", "a"]))
+        .count(this.undoneTaskKeyRange(parentId))
     );
   }
 
@@ -194,8 +177,7 @@ export class DataService {
         .transaction("REMINDER", "readonly")
         .objectStore("REMINDER")
         .index("IX_REMINDER_DATE")
-        // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
-        .getAll(IDBKeyRange.bound([tId, ""], [tId, "a"]))
+        .getAll(this.reminderForTaskKeyRange(tId))
     );
   }
 }

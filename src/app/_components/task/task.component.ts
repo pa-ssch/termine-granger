@@ -12,6 +12,8 @@ export class TaskComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
-    DataService.loadMe().getChildrenCount(this.task.taskId, (t) => (this.childCount = t));
+    DataService.loadMe()
+      .getChildrenCount(this.task.taskId)
+      .then((t) => (this.childCount = t));
   }
 }

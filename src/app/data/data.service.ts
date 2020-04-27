@@ -23,19 +23,15 @@ export class DataService {
   }
 
   //#region promises
-  private dbReadyPromise(timeout: number = 0) {
-    console.log(timeout === 0 ? "check db connection" : "waiting for db connection...");
-    return new Promise((res) =>
-      setTimeout(() => {
-        if (this.openReq?.readyState !== "done") {
-          // Wenn beim 1. Versuch die DB noch nicht ready ist, dann zwischen jedem weiteren Versuch 100ms warten.
-          this.dbReadyPromise(100);
-        } else {
-          console.log("db is connected");
+  private dbReadyPromise() {
+    return new Promise((res) => {
+      if (this.db) res();
+      else if (this.openReq && this.openReq.readyState !== "done")
+        this.openReq.onsuccess = () => {
+          if (!this.db) this.db = this.openReq.result;
           res();
-        }
-      }, timeout)
-    );
+        };
+    });
   }
 
   private requestPromise<T>(req: IDBRequest) {
@@ -51,14 +47,12 @@ export class DataService {
   private constructor() {}
 
   private open() {
-    this.dbReadyPromise();
     this.indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
 
     // Open & Init DB
     this.openReq = this.indxDb.open(DataService.DB_NAME, 1);
-    this.openReq.addEventListener("success", () => (this.db = this.openReq.result));
-    this.openReq.addEventListener("upgradeneeded", () => this.createOrUpgrade());
-    this.openReq.addEventListener("error", () => console.log("[onerror]", this.openReq.error));
+    this.openReq.onupgradeneeded = () => this.createOrUpgrade();
+    this.openReq.onerror = () => console.log("[onerror]", this.openReq.error);
   }
 
   static loadMe(): DataService {

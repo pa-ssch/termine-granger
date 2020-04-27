@@ -11,22 +11,19 @@ export class TaskListComponent implements OnInit {
   taskList: Task[] = [];
 
   ngOnInit(): void {
-    // if (!this.tId) this.tId = 0;
+    if (!this.tId) this.tId = 0;
     this.loadData();
   }
 
   constructor() {}
 
   loadData(event?: any) {
-    DataService.loadMe().getTasks(
-      this.tId,
-      (taskList) => {
+    DataService.loadMe()
+      .getTasks(this.tId, this.taskList.length, 25)
+      .then((taskList) => {
         taskList.forEach((task) => this.taskList.push(task));
         if (taskList.length < 25 && event) event.target.disabled = true;
-      },
-      this.taskList.length,
-      25
-    );
+      });
 
     event?.target.complete();
   }

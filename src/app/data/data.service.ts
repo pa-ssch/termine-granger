@@ -129,6 +129,8 @@ export class DataService {
 
     return await new Promise<Task[]>((res, rej) => {
       req.onsuccess = () => {
+        if (cnt == 0 || !req.result) res(retval);
+
         if (skip > 0) {
           req.result.advance(skip);
           skip = 0;
@@ -139,8 +141,6 @@ export class DataService {
           cnt--;
           req.result.continue();
         }
-
-        if (cnt == 0 || !req.result) res(retval);
       };
       req.onerror = () => rej(req.error);
     });

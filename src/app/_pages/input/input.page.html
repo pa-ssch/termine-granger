@@ -31,16 +31,16 @@
       </ion-item>
 
       <app-datetime
-        [min]="task.startTime?.toISOString()"
-        [time]="task.deadLineTime?.toISOString()"
+        [min]="task.startTime"
+        [time]="task.deadLineTime"
         placeholder="Deadline"
         [pickerOptions]="getDeadlinePickerOptions()"
         icon="golf"
       ></app-datetime>
 
       <app-datetime
-        [max]="task.deadLineTime?.toISOString()"
-        [time]="task.startTime?.toISOString()"
+        [max]="task.deadLineTime"
+        [time]="task.startTime"
         placeholder="Start"
         [pickerOptions]="getStartdatePickerOptions()"
         icon="play"
@@ -56,7 +56,7 @@
       <app-datetime
         *ngFor="let r of reminderList"
         icon="alarm"
-        [time]="r.reminderTime?.toISOString()"
+        [time]="r.reminderTime"
         [pickerOptions]="getReminderPickerOptions(r)"
         placeholder="Add..."
       ></app-datetime>

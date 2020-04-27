@@ -27,18 +27,24 @@ export class InputPage implements OnInit {
         .then((t) => (this.task = t));
       DataService.loadMe()
         .getReminder(tId)
-        .then((r) => (this.reminderList = r));
+        .then((r) => {
+          this.reminderList = r;
+          // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
+          this.reminderList.push(new Reminder());
+        });
     } else {
       // neu erstellen
       this.task.parentId = +this.activatedRoute.snapshot.paramMap.get("parentTaskId");
+      // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
+      this.reminderList.push(new Reminder());
     }
-
-    // Ein neuer leerer Reminder ist benötigt
-    this.reminderList.push(new Reminder());
   }
 
   saveAndClose() {
-    DataService.loadMe().updateTask(this.task, this.reminderList);
+    DataService.loadMe().updateTask(
+      this.task,
+      this.reminderList.filter((r) => r.reminderTime)
+    );
     this.navCtrl.back();
   }
 
@@ -48,7 +54,7 @@ export class InputPage implements OnInit {
         // Es wurde ein neuer Reminder erstellt -> Ein neuer leerer Reminder ist benötigt
         if (!reminder.reminderTime) this.reminderList.push(new Reminder());
         // Datum ändern
-        reminder.reminderTime = DatetimeComponent.getDateFromPickerobject(d);
+        reminder.reminderTime = DatetimeComponent.getDateFromPickerobject(d)?.toISOString();
       },
       () => (this.reminderList = this.reminderList.filter((r) => r !== reminder))
     );
@@ -56,14 +62,14 @@ export class InputPage implements OnInit {
 
   getStartdatePickerOptions() {
     return DatetimeComponent.getPickerOptions(
-      (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerobject(d)),
+      (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerobject(d)?.toISOString()),
       () => (this.task.startTime = null)
     );
   }
 
   getDeadlinePickerOptions() {
     return DatetimeComponent.getPickerOptions(
-      (d: any) => (this.task.deadLineTime = DatetimeComponent.getDateFromPickerobject(d)),
+      (d: any) => (this.task.deadLineTime = DatetimeComponent.getDateFromPickerobject(d)?.toISOString()),
       () => (this.task.deadLineTime = null)
     );
   }

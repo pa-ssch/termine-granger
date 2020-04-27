@@ -74,7 +74,7 @@ export class DataService {
       autoIncrement: true,
     });
     ts.createIndex("IX_TASK_ID_UNIQUE", "taskId", { unique: true });
-    ts.createIndex("IX_TASK_START_DATE", ["parentId", "isDoneDate", "_startTime"]);
+    ts.createIndex("IX_TASK_START_DATE", ["parentId", "isDoneDate", "startTime"]);
     // ts.createIndex("IX_TASK_EXT_SRC", "extSourceLink");
     // evtl. isBlocker & prio
 

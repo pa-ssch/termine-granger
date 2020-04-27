@@ -1,7 +1,8 @@
 {
   "name": "tg",
   "integrations": {
-    "capacitor": {}
+    "capacitor": {},
+    "cordova": {}
   },
   "type": "angular"
 }

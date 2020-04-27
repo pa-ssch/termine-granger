@@ -116,7 +116,7 @@ export class DataService {
   }
 
   /** Comment */
-  async getTasks(parentId: number, skip?: number, cnt?: number): Promise<Task[]> {
+  async getTasks(parentId: number, skip?: number, cnt: number = 0): Promise<Task[]> {
     await this.dbReadyPromise();
 
     var req = this.db
@@ -125,22 +125,20 @@ export class DataService {
       .index("IX_TASK_START_DATE")
       .openCursor(this.undoneTaskKeyRange(parentId));
 
-    var retval: Task[] = [];
+    var tasks: Task[] = [];
 
     return await new Promise<Task[]>((res, rej) => {
       req.onsuccess = () => {
-        if (cnt == 0 || !req.result) res(retval);
+        if (cnt == 0 || !req.result) return res(tasks);
 
         if (skip > 0) {
           req.result.advance(skip);
-          skip = 0;
+          return (skip = 0);
         }
 
-        if (req.result && cnt > 0) {
-          retval.push(req.result.value);
-          cnt--;
-          req.result.continue();
-        }
+        tasks.push(req.result.value);
+        cnt--;
+        req.result.continue();
       };
       req.onerror = () => rej(req.error);
     });

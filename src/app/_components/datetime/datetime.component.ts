@@ -48,12 +48,12 @@ export class DatetimeComponent implements OnInit {
     };
   }
 
-  static getDateFromPickerobject(d) {
-    // Verhalten von Date Object (JS)
-    // Der Monat ist Index-Basiert. Der Tag Kalenderbasiert
-    // Monat 10 = November
-    // Tag 10 = 10. Tag im Monat
-    // => Daher muss vom Monat [1] subtrahiert werden.
+  static getDateFromPickerObject(d): Date {
+    // Verhalten von Date Object (JS):
+    //    Der Monat ist Index-Basiert. Der Tag Kalenderbasiert
+    //    Monat 1 = Februar (2. Monat im Jahr)
+    //    Tag 1 = 1. Tag im Monat
+    //    => Daher muss vom Monat [1] subtrahiert werden.
 
     return new Date(d.year.value, d.month.value - 1, d.day.value, d.hour.value, d.minute.value);
   }

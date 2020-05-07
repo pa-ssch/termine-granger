@@ -1,3 +1,5 @@
+type uint2 = 1 | 2 | 3;
+
 export class Task {
   taskId?: number;
   title: string = "";
@@ -8,7 +10,7 @@ export class Task {
   duration?: number;
   deadLineTime?: string;
 
-  priority?: number;
+  priority?: uint2;
   //isVisible?: boolean;
   isBlocker: boolean;
   isDoneDate: string = "";

@@ -1,6 +1,6 @@
 import { DataService } from "./../../data/data.service";
 import { Component, OnInit, Input } from "@angular/core";
-import { Task } from "src/app/data/Task";
+import { Task } from "src/app/data/task";
 @Component({
   selector: "app-task",
   templateUrl: "./task.component.html",

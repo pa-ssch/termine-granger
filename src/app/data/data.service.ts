@@ -1,6 +1,8 @@
+import { updateTask } from "./requests/updateTask";
+import { getReminder } from "./requests/getReminder";
+import { getTask } from "./requests/getTask";
+import { getTasks } from "./requests/getTasks";
 import { Injectable } from "@angular/core";
-import { Task } from "./Task";
-import { Reminder } from "./Reminder";
 
 @Injectable({
   providedIn: "root",
@@ -8,22 +10,27 @@ import { Reminder } from "./Reminder";
 export class DataService {
   private static instance: DataService;
   private indxDb: IDBFactory;
-  private db: IDBDatabase;
   private static readonly DB_NAME = "TG_DB";
   private openReq: IDBOpenDBRequest;
+  protected db: IDBDatabase;
 
-  private undoneTaskKeyRange(tId: number): IDBKeyRange {
+  public getReminder = getReminder;
+  public updateTask = updateTask;
+  public getTask = getTask;
+  public getTasks = getTasks;
+
+  protected undoneTaskKeyRange(tId: number): IDBKeyRange {
     // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
     return IDBKeyRange.bound([tId, "", ""], [tId, "", "a"]);
   }
 
-  private reminderForTaskKeyRange(tId: number): IDBKeyRange {
+  protected reminderForTaskKeyRange(tId: number): IDBKeyRange {
     // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
     return IDBKeyRange.bound([tId, ""], [tId, "a"]);
   }
 
   //#region promises
-  private dbReadyPromise() {
+  protected dbReadyPromise() {
     return new Promise((res) => {
       if (this.db) res();
       else if (this.openReq && this.openReq.readyState !== "done")
@@ -34,7 +41,7 @@ export class DataService {
     });
   }
 
-  private requestPromise<T>(req: IDBRequest) {
+  protected requestPromise<T>(req: IDBRequest) {
     return new Promise<T>((res, rej) => {
       req.onsuccess = () => res(req.result);
       req.onerror = () => rej(req.error);
@@ -43,7 +50,6 @@ export class DataService {
 
   //#endregion promises
 
-  //#region openData
   private constructor() {}
 
   private open() {
@@ -65,9 +71,8 @@ export class DataService {
     }
   }
 
+  /** Upgrade oder neue DB benötigt */
   private createOrUpgrade(): any {
-    // Upgrade oder neue DB benötigt
-
     var db = this.openReq.result;
     var ts = db.createObjectStore("TASK", {
       keyPath: "taskId",
@@ -84,92 +89,5 @@ export class DataService {
     });
     rs.createIndex("IX_REMINDER_ID_UNIQUE", "reminderId", { unique: true });
     rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
-  }
-  //#endregion openData
-
-  /** Ändert eine bestehende Aufgabe oder fügt eine neue hinzu */
-  async updateTask(task: Task, reminder?: Reminder[]) {
-    await this.dbReadyPromise();
-
-    var transaction = this.db.transaction(["TASK", "REMINDER"], "readwrite");
-    var ts = transaction.objectStore("TASK");
-    var rs = transaction.objectStore("REMINDER");
-
-    this.requestPromise(ts.put(task)).then((res) => {
-      task.taskId = +res.valueOf();
-
-      // Reminder updaten
-      var req = rs.index("IX_REMINDER_DATE").getAll(this.reminderForTaskKeyRange(task.taskId));
-      req.onsuccess = function (event) {
-        // Delete
-        var deleted: Reminder[] = this.result.filter((r) => !reminder.includes(r));
-        deleted.forEach((r) => rs.delete(r.reminderId));
-
-        // Insert / Update
-        reminder.forEach((r) => {
-          r.taskId = task.taskId;
-          let reminderReq = rs.put(r);
-          reminderReq.addEventListener("success", () => (r.reminderId = +reminderReq.result.valueOf()));
-        });
-      };
-    });
-  }
-
-  /** Comment */
-  async getTasks(parentId: number, skip?: number, cnt: number = 0): Promise<Task[]> {
-    await this.dbReadyPromise();
-
-    var req = this.db
-      .transaction("TASK", "readonly")
-      .objectStore("TASK")
-      .index("IX_TASK_START_DATE")
-      .openCursor(this.undoneTaskKeyRange(parentId));
-
-    var tasks: Task[] = [];
-
-    return await new Promise<Task[]>((res, rej) => {
-      req.onsuccess = () => {
-        if (cnt == 0 || !req.result) return res(tasks);
-
-        if (skip > 0) {
-          req.result.advance(skip);
-          return (skip = 0);
-        }
-
-        tasks.push(req.result.value);
-        cnt--;
-        req.result.continue();
-      };
-      req.onerror = () => rej(req.error);
-    });
-  }
-
-  async getChildrenCount(parentId: number): Promise<number> {
-    await this.dbReadyPromise();
-
-    return this.requestPromise<number>(
-      this.db
-        .transaction("TASK", "readonly")
-        .objectStore("TASK")
-        .index("IX_TASK_START_DATE")
-        .count(this.undoneTaskKeyRange(parentId))
-    );
-  }
-
-  async getTask(tId: number): Promise<Task> {
-    await this.dbReadyPromise();
-    return this.requestPromise<Task>(this.db.transaction("TASK", "readonly").objectStore("TASK").get(tId));
-  }
-
-  async getReminder(tId: number): Promise<Reminder[]> {
-    await this.dbReadyPromise();
-
-    return this.requestPromise<Reminder[]>(
-      this.db
-        .transaction("REMINDER", "readonly")
-        .objectStore("REMINDER")
-        .index("IX_REMINDER_DATE")
-        .getAll(this.reminderForTaskKeyRange(tId))
-    );
   }
 }

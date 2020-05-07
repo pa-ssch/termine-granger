@@ -1,9 +1,9 @@
 import { DatetimeComponent } from "./../../_components/datetime/datetime.component";
 import { DataService } from "./../../data/data.service";
-import { Task } from "./../../data/Task";
-import { Component, OnInit, EventEmitter } from "@angular/core";
+import { Task } from "../../data/task";
+import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { Reminder } from "src/app/data/Reminder";
+import { Reminder } from "src/app/data/reminder";
 import { NavController } from "@ionic/angular";
 
 @Component({

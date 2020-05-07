@@ -8,9 +8,8 @@ import { Injectable } from "@angular/core";
   providedIn: "root",
 })
 export class DataService {
-  private static instance: DataService;
-  private indxDb: IDBFactory;
   private static readonly DB_NAME = "TG_DB";
+  private static instance: DataService;
   private openReq: IDBOpenDBRequest;
   protected db: IDBDatabase;
 
@@ -53,10 +52,8 @@ export class DataService {
   private constructor() {}
 
   private open() {
-    this.indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
-
-    // Open & Init DB
-    this.openReq = this.indxDb.open(DataService.DB_NAME, 1);
+    var indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
+    this.openReq = indxDb.open(DataService.DB_NAME, 1);
     this.openReq.onupgradeneeded = () => this.createOrUpgrade();
     this.openReq.onerror = () => console.log("[onerror]", this.openReq.error);
   }
@@ -72,7 +69,7 @@ export class DataService {
   }
 
   /** Upgrade oder neue DB benötigt */
-  private createOrUpgrade(): any {
+  private async createOrUpgrade() {
     var db = this.openReq.result;
     var ts = db.createObjectStore("TASK", {
       keyPath: "taskId",

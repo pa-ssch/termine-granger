@@ -1,4 +1,5 @@
 import { DataService } from "./../data.service";
+
 export async function getChildrenCount(this: DataService, parentId: number): Promise<number> {
   await this.dbReadyPromise();
 

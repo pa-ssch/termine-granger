@@ -3,6 +3,7 @@ import { getReminder } from "./requests/getReminder";
 import { getTask } from "./requests/getTask";
 import { getTasks } from "./requests/getTasks";
 import { Injectable } from "@angular/core";
+import { getChildrenCount } from "./requests/getChildrenCount";
 
 @Injectable({
   providedIn: "root",
@@ -17,6 +18,7 @@ export class DataService {
   public updateTask = updateTask;
   public getTask = getTask;
   public getTasks = getTasks;
+  public getChildrenCount = getChildrenCount;
 
   protected undoneTaskKeyRange(tId: number): IDBKeyRange {
     // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'

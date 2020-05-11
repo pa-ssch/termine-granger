@@ -18,4 +18,12 @@ export class Task {
   parentId: number = 0;
 
   extSourceLink?: string;
+
+  static compare(a: Task, b: Task): number {
+    if (a.startTime > b.startTime) return 1;
+
+    if (a.startTime < b.startTime) return -1;
+
+    return 0;
+  }
 }

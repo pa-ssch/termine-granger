@@ -5,6 +5,7 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Reminder } from "src/app/data/reminder";
 import { NavController } from "@ionic/angular";
+import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
 
 @Component({
   selector: "app-input",
@@ -15,7 +16,11 @@ export class InputPage implements OnInit {
   task: Task;
   reminderList: Reminder[];
 
-  constructor(private activatedRoute: ActivatedRoute, private navCtrl: NavController) {}
+  constructor(
+    private activatedRoute: ActivatedRoute,
+    private navCtrl: NavController,
+    private taskUpdateService: GlobalTaskUpdateService
+  ) {}
 
   ngOnInit() {
     this.task = new Task();
@@ -41,10 +46,13 @@ export class InputPage implements OnInit {
   }
 
   saveAndClose() {
-    DataService.loadMe().updateTask(
-      this.task,
-      this.reminderList.filter((r) => r.reminderTime)
-    );
+    DataService.loadMe()
+      .updateTask(
+        this.task,
+        this.reminderList.filter((r) => r.reminderTime)
+      )
+      .then(() => this.taskUpdateService.publish(this.task));
+
     this.navCtrl.back();
   }
 

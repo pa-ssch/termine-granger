@@ -10,8 +10,8 @@ export class Task {
   duration?: number;
   deadLineTime?: string;
 
-  priority?: uint2;
-  //isVisible?: boolean;
+  priority: uint2 = 2;
+  isVisible?: boolean;
   isBlocker: boolean;
   isDoneDate: string = "";
 

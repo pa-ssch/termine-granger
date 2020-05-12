@@ -2,7 +2,7 @@
   <app-task *ngFor="let t of taskList" [task]="t"></app-task>
 </ion-list>
 
-<ion-infinite-scroll (ionInfinite)="loadData($event)">
+<ion-infinite-scroll (ionInfinite)="taskList.loadData($event)">
   <ion-infinite-scroll-content loadingSpinner="Dots" loadingText="Loading more data..."
     >></ion-infinite-scroll-content
   >

@@ -26,8 +26,15 @@
     <ion-card-content>
       <ion-item no-padding lines="none">
         <ion-icon name="hourglass" slot="start"></ion-icon>
-        <ion-label>Dauer</ion-label>
-        <!-- duration?: nummer + einheit (Stunden, Tage, w, m, j); -->
+
+        <ion-input [value]="task.getDurationPerUnit()" type="number" min="1"></ion-input>
+        <ion-select [value]="task.getDurationUnit()" interface="popover">
+          <ion-select-option value="m">Minute(n)</ion-select-option>
+          <ion-select-option value="h">Stunde(n)</ion-select-option>
+          <ion-select-option value="d">Tag(e)</ion-select-option>
+          <ion-select-option value="M">Monat(e)</ion-select-option>
+          <ion-select-option value="a">Jahr(e)</ion-select-option>
+        </ion-select>
       </ion-item>
 
       <app-datetime

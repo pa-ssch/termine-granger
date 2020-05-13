@@ -66,14 +66,14 @@
     <ion-card-content>
       <ion-item no-padding lines="full">
         <ion-icon name="alert-circle" slot="start"></ion-icon>
-        <ion-segment mode="ios" value="medium">
-          <ion-segment-button value="low" layout="icon-bottom">
+        <ion-segment mode="ios" [(ngModel)]="task.priority">
+          <ion-segment-button value="0" layout="icon-bottom">
             <ion-icon name="arrow-down-circle"></ion-icon>
           </ion-segment-button>
-          <ion-segment-button value="medium" layout="icon-bottom">
+          <ion-segment-button value="1" layout="icon-bottom">
             <ion-icon name="ellipse-outline"></ion-icon>
           </ion-segment-button>
-          <ion-segment-button value="high" layout="icon-top">
+          <ion-segment-button value="2" layout="icon-top">
             <ion-icon name="arrow-up-circle"></ion-icon>
           </ion-segment-button>
         </ion-segment>
@@ -81,13 +81,18 @@
 
       <ion-item no-padding lines="full">
         <ion-icon name="reader" slot="start"></ion-icon>
-        <ion-textarea auto-grow="true" rows="1" placeholder="Hier Infos eingeben"></ion-textarea>
+        <ion-textarea
+          [(ngModel)]="task.description"
+          auto-grow="true"
+          rows="1"
+          placeholder="Hier Infos eingeben"
+        ></ion-textarea>
       </ion-item>
 
       <ion-item no-padding lines="none">
         <ion-icon name="shield" slot="start"></ion-icon>
         <ion-label>Ist Blocker</ion-label>
-        <ion-toggle></ion-toggle>
+        <ion-toggle [(ngModel)]="task.isBlocker"></ion-toggle>
       </ion-item>
     </ion-card-content>
   </ion-card>

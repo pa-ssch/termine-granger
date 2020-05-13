@@ -7,7 +7,7 @@ export class Task {
 
   startTime?: string = new Date().toISOString();
 
-  duration?: number;
+  duration: number = 0;
   deadLineTime?: string;
 
   priority: uint2 = 1;
@@ -26,4 +26,11 @@ export class Task {
 
     return 0;
   }
+
+  // checkIntegrity() {
+  //   return;
+  //   // Gleitkommazahl, unsigniert
+  //   // Datum string
+  //   // Integer, 32 Bit, unsigniert
+  // }
 }

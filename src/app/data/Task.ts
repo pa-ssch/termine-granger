@@ -1,4 +1,4 @@
-type uint2 = 1 | 2 | 3;
+import { uint2 } from "./types/uints";
 
 export class Task {
   taskId?: number;
@@ -10,7 +10,7 @@ export class Task {
   duration?: number;
   deadLineTime?: string;
 
-  priority: uint2 = 2;
+  priority: uint2 = 1;
   isVisible?: boolean;
   isBlocker: boolean;
   isDoneDate: string = "";

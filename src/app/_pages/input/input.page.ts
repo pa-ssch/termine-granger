@@ -81,43 +81,4 @@ export class InputPage implements OnInit {
       () => (this.task.deadLineTime = null)
     );
   }
-
-  get duration(): number {
-    if (this.task.duration % 60 === 0) {
-      // es sind stunden
-      if (this.task.duration % (60 * 24) === 0) {
-        // es sind tage
-        if (this.task.duration % (60 * 24 * 31) === 0) {
-          //es sind monate
-          if (this.task.duration % (60 * 24 * 31 * 12) === 0) {
-            // es sind Jahre
-            this.durationUnit = "a";
-            return this.task.duration / (60 * 24 * 31 * 12);
-          }
-          this.durationUnit = "M";
-          return this.task.duration / (60 * 24 * 31);
-        }
-        this.durationUnit = "d";
-        return this.task.duration / (60 * 24);
-      }
-      this.durationUnit = "h";
-      return this.task.duration / 60;
-    }
-    this.durationUnit = "m";
-    return this.task.duration;
-  }
-
-  // Eigenes objekt mit unit, unitduration & duratoinhour
-  // --> umrechnungen
-  //unit und unitduration binden (ngModel)
-  // jeweils umrechnen (bei änderung)
-  //
-
-  set duration(duration: number) {}
-
-  get durationUnit(): String {
-    return "m";
-  }
-
-  set durationUnit(durationUnit: String) {}
 }

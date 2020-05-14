@@ -10,7 +10,6 @@ import { getChildrenCount } from "./requests/getChildrenCount";
 })
 export class DataService {
   private static readonly DB_NAME = "TG_DB";
-  private static instance: DataService;
   private openReq: IDBOpenDBRequest;
   protected db: IDBDatabase;
 
@@ -51,23 +50,15 @@ export class DataService {
 
   //#endregion promises
 
-  private constructor() {}
+  private constructor() {
+    this.open();
+  }
 
   private open() {
     var indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
     this.openReq = indxDb.open(DataService.DB_NAME, 1);
     this.openReq.onupgradeneeded = () => this.createOrUpgrade();
     this.openReq.onerror = () => console.log("[onerror]", this.openReq.error);
-  }
-
-  static loadMe(): DataService {
-    if (this.instance) {
-      return this.instance;
-    } else {
-      this.instance = new DataService();
-      this.instance.open();
-      return this.instance;
-    }
   }
 
   /** Upgrade oder neue DB benötigt */

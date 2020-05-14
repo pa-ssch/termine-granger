@@ -13,11 +13,20 @@ export class Task {
   priority: uint2 = 1;
   isVisible?: boolean;
   isBlocker: boolean;
-  isDoneDate: string = "";
+  private isDoneDate: string = "";
 
   parentId: number = 0;
 
   extSourceLink?: string;
+
+  get isDone(): boolean {
+    return this.isDoneDate?.length > 0;
+  }
+
+  set isDone(check: boolean) {
+    if (check && !this.isDone) this.isDoneDate = new Date().toISOString();
+    else if (!check) this.isDoneDate = null;
+  }
 
   static compare(a: Task, b: Task): number {
     if (a.startTime > b.startTime) return 1;
@@ -26,7 +35,6 @@ export class Task {
 
     return 0;
   }
-
   // checkIntegrity() {
   //   return;
   //   // Gleitkommazahl, unsigniert

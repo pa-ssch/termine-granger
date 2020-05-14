@@ -3,7 +3,11 @@ import { DataService } from "./data.service";
 import { GlobalTaskUpdateService } from "../events/global-task-update.service";
 
 export class TaskList extends Array<Task> {
-  constructor(private tId: number, taskUpdateService: GlobalTaskUpdateService) {
+  constructor(
+    private tId: number,
+    taskUpdateService: GlobalTaskUpdateService,
+    private dataService: DataService
+  ) {
     super();
 
     taskUpdateService.getObservable().subscribe(this.addOrChange);
@@ -14,13 +18,11 @@ export class TaskList extends Array<Task> {
   loadData(event?: any, count?: number) {
     if (!count) count = 25;
 
-    DataService.loadMe()
-      .getTasks(this.tId, this.length, count)
-      .then((taskList) => {
-        console.log(taskList.length + " Aufgabe(n) geladen");
-        taskList.forEach((task) => this.push(task));
-        if (taskList.length < count && event) event.target.disabled = true;
-      });
+    this.dataService.getTasks(this.tId, this.length, count).then((taskList) => {
+      console.log(taskList.length + " Aufgabe(n) geladen");
+      taskList.forEach((task) => this.push(task));
+      if (taskList.length < count && event) event.target.disabled = true;
+    });
 
     event?.target.complete();
   }
@@ -38,7 +40,11 @@ export class TaskList extends Array<Task> {
 
     // Wenn die Aufgabe geändert wurde, änderungen übernehmen
     if (oldTaskIndex > -1) {
-      if (this[oldTaskIndex].startTime === task.startTime) {
+      if (this[oldTaskIndex].isDone !== task.isDone) {
+        // Wenn sich der abgeschlossen-Status geändert hat, aufgabe entfernen,
+        // da offene & abgeschlossene Aufgaben nie gemeinsam angezeigt werden.
+        return;
+      } else if (this[oldTaskIndex].startTime === task.startTime) {
         // Wenn die Startzeit gleich ist, wird keine umsortierung benötigt
         this[oldTaskIndex] = task;
         return;

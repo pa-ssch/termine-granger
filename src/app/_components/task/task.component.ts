@@ -1,6 +1,7 @@
 import { DataService } from "./../../data/data.service";
 import { Component, OnInit, Input } from "@angular/core";
 import { Task } from "src/app/data/task";
+import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
 @Component({
   selector: "app-task",
   templateUrl: "./task.component.html",
@@ -9,11 +10,16 @@ import { Task } from "src/app/data/task";
 export class TaskComponent implements OnInit {
   @Input() task: Task;
   childCount: number;
-  constructor() {}
+  constructor(private taskUpdateService: GlobalTaskUpdateService, private dataService: DataService) {}
 
   ngOnInit() {
-    DataService.loadMe()
-      .getChildrenCount(this.task.taskId)
-      .then((t) => (this.childCount = t));
+    this.dataService.getChildrenCount(this.task.taskId).then((t) => (this.childCount = t));
+  }
+
+  checkedChanged(event: any) {
+    if (this.task.isDone !== event.target.checked) {
+      this.task.isDone = event.target.checked;
+      this.taskUpdateService.publish(this.task);
+    }
   }
 }

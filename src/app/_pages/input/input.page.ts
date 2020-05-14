@@ -19,7 +19,8 @@ export class InputPage implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private navCtrl: NavController,
-    private taskUpdateService: GlobalTaskUpdateService
+    private taskUpdateService: GlobalTaskUpdateService,
+    private dataService: DataService
   ) {}
 
   ngOnInit() {
@@ -27,16 +28,12 @@ export class InputPage implements OnInit {
     var tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
     this.reminderList = [];
     if (tId > 0) {
-      DataService.loadMe()
-        .getTask(tId)
-        .then((t) => (this.task = t));
-      DataService.loadMe()
-        .getReminder(tId)
-        .then((r) => {
-          this.reminderList = r;
-          // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
-          this.reminderList.push(new Reminder());
-        });
+      this.dataService.getTask(tId).then((t) => (this.task = t));
+      this.dataService.getReminder(tId).then((r) => {
+        this.reminderList = r;
+        // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
+        this.reminderList.push(new Reminder());
+      });
     } else {
       // neu erstellen
       this.task.parentId = +this.activatedRoute.snapshot.paramMap.get("parentTaskId");
@@ -46,7 +43,7 @@ export class InputPage implements OnInit {
   }
 
   saveAndClose() {
-    DataService.loadMe()
+    this.dataService
       .updateTask(
         this.task,
         this.reminderList.filter((r) => r.reminderTime)

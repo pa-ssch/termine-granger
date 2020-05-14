@@ -51,10 +51,7 @@ export class DataService {
   //#endregion promises
 
   private constructor() {
-    this.open();
-  }
-
-  private open() {
+    // DB Verbindung öffnen
     var indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
     this.openReq = indxDb.open(DataService.DB_NAME, 1);
     this.openReq.onupgradeneeded = () => this.createOrUpgrade();

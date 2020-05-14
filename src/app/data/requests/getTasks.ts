@@ -13,7 +13,7 @@ export async function getTasks(
     .transaction("TASK", "readonly")
     .objectStore("TASK")
     .index("IX_TASK_START_DATE")
-    .openCursor(this.undoneTaskKeyRange(parentId));
+    .openCursor(this.undoneTaskKeyRange(+parentId));
 
   var tasks: Task[] = [];
 

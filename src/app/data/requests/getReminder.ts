@@ -9,6 +9,6 @@ export async function getReminder(this: DataService, tId: number): Promise<Remin
       .transaction("REMINDER", "readonly")
       .objectStore("REMINDER")
       .index("IX_REMINDER_DATE")
-      .getAll(this.reminderForTaskKeyRange(tId))
+      .getAll(this.reminderForTaskKeyRange(+tId))
   );
 }

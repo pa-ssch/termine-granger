@@ -12,5 +12,8 @@ export class ListPage implements OnInit {
 
   ngOnInit() {
     this.tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
+
+    alert("hier muss noch korrekt implemntiert  werden -> sodass tId gesetzt ist");
+    alert("unterliste lädt evtl id nicht richtig...");
   }
 }

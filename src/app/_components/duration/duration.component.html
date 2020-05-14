@@ -1,7 +1,7 @@
 <ion-item no-padding lines="none">
   <ion-icon name="hourglass" slot="start"></ion-icon>
 
-  <ion-input [(ngModel)]="duration" (ionChange)="change()" type="number" min="0"></ion-input>
+  <ion-input [(ngModel)]="unitDuration" (ionChange)="change()" type="number" min="0"></ion-input>
   <ion-select [(ngModel)]="unit" (ionChange)="change()" interface="popover">
     <ion-select-option *ngFor="let u of units" [value]="u">{{ u.label }}</ion-select-option>
   </ion-select>

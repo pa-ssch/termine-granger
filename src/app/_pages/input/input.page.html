@@ -24,7 +24,7 @@
     </ion-item>
 
     <ion-card-content>
-      <app-duration ngDefaultControl [(ngModel)]="task.duration"></app-duration>
+      <app-duration ngDefaultControl [(minuteDuration)]="task.duration"></app-duration>
 
       <app-datetime
         [min]="task.startTime"

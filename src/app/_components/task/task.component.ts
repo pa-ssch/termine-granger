@@ -1,5 +1,5 @@
 import { DataService } from "./../../data/data.service";
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { Task } from "src/app/data/task";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
 @Component({
@@ -7,13 +7,18 @@ import { GlobalTaskUpdateService } from "src/app/events/global-task-update.servi
   templateUrl: "./task.component.html",
   styleUrls: ["./task.component.scss"],
 })
-export class TaskComponent implements OnInit {
-  @Input() task: Task;
+export class TaskComponent {
+  _task: Task;
   childCount: number;
   constructor(private taskUpdateService: GlobalTaskUpdateService, private dataService: DataService) {}
 
-  ngOnInit() {
-    this.dataService.getChildrenCount(this.task.taskId).then((t) => (this.childCount = t));
+  get task(): Task {
+    return this._task;
+  }
+
+  @Input() set task(task: Task) {
+    this._task = task;
+    this.dataService.getChildrenCount(+this.task.taskId).then((t) => (this.childCount = t));
   }
 
   checkedChanged(event: any) {

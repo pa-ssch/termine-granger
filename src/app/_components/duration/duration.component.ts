@@ -1,5 +1,5 @@
+import { durationUnit, getAllUnits } from "./../../data/types/durationUnit";
 import { Component, Input, Output, EventEmitter } from "@angular/core";
-import { durationUnit, getAllUnits } from "src/app/data/types/durationUnit";
 
 @Component({
   selector: "app-duration",
@@ -16,8 +16,10 @@ export class DurationComponent {
   @Input()
   /** Dauer in Minuten - unabhängig von der gewählten Einheit */
   set minuteDuration(value: number) {
-    // Bei Dauer == 0 wird Minuten als Einheit gewählt
+    if (this.unitDuration) return;
+
     if (value == 0) {
+      // Bei Dauer == 0 wird Minuten als Einheit gewählt
       this.unitDuration = 0;
       this.unit = this.units[0];
       return;
@@ -41,6 +43,7 @@ export class DurationComponent {
 
   change() {
     if (!this.unitDuration || this.unitDuration < 0) this.unitDuration = 0;
+
     this.unitDuration = Math.floor(this.unitDuration);
 
     this.minuteDurationChange.emit(this.unitDuration * this.unit.minutes);

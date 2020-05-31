@@ -18,7 +18,7 @@ export class TaskListComponent {
   @Input()
   set tId(tId: number) {
     this._tId = +tId;
-    this.taskList = new TaskList(this._tId, this.taskUpdateService, this.dataService);
+    this.taskList = new TaskList(this.tId, this.taskUpdateService, this.dataService);
   }
 
   constructor(private taskUpdateService: GlobalTaskUpdateService, private dataService: DataService) {}

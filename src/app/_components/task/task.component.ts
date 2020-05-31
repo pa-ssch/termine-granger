@@ -21,6 +21,8 @@ export class TaskComponent {
     this.dataService.getChildrenCount(+this.task.taskId).then((t) => (this.childCount = t));
   }
 
+  // das hier ist gleiches objket wie in liste... -> vergleich mit in liste nicht möglich
+  // Splice erstellt anscheinend neues objekt
   checkedChanged(event: any) {
     if (this.task.isDone !== event.target.checked) {
       this.task.isDone = event.target.checked;

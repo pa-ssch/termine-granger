@@ -9,7 +9,7 @@ export class TaskList extends Array<Task> {
     private dataService: DataService
   ) {
     super();
-    taskUpdateService.getObservable().subscribe(this.addOrChange);
+    taskUpdateService.getObservable().subscribe((task) => this.addOrChange(task, this));
 
     this.loadData();
   }
@@ -30,41 +30,39 @@ export class TaskList extends Array<Task> {
     return this[this.length - 1];
   }
 
-  addOrChange(task: Task) {
+  addOrChange(task: Task, taskList: TaskList) {
     // Nur Aufgaben mit gleichem Parent können in einer Liste gespeichert werden
-    if (task.parentId !== this.tId) return;
+    if (task.parentId !== taskList.tId) return;
 
     // Falls die Aufgabe schon in der Liste ist, den Index des Eintrages heraussuchen
-    var oldTaskIndex = this.findIndex((t) => t.taskId === task.taskId);
-
+    var oldTaskIndex = taskList.findIndex((t) => t.taskId === task.taskId);
     // Wenn die Aufgabe geändert wurde, änderungen übernehmen
     if (oldTaskIndex > -1) {
-      if (this[oldTaskIndex].isDone !== task.isDone) {
+      if (taskList[oldTaskIndex].isDone !== task.isDone) {
         // Wenn sich der abgeschlossen-Status geändert hat, aufgabe entfernen,
         // da offene & abgeschlossene Aufgaben nie gemeinsam angezeigt werden.
-        this.splice(oldTaskIndex, 1);
         return;
-      } else if (this[oldTaskIndex].startTime === task.startTime) {
+      } else if (taskList[oldTaskIndex].startTime === task.startTime) {
         // Wenn die Startzeit gleich ist, wird keine umsortierung benötigt
-        this[oldTaskIndex] = task;
+        taskList[oldTaskIndex] = task;
         return;
       } else {
         // Aufgabe entfernen, wenn sich der Startzeitpunkt geändert hat
-        this.splice(oldTaskIndex, 1);
+        taskList.splice(oldTaskIndex, 1);
       }
     }
 
     // Aufgabe hinzufügen, wenn sie im Bereich der angezeigten Aufgaben ist
     for (var index: number = 0; this[index]; index++)
-      if (this[index].startTime > task.startTime) {
-        this.splice(index, 0, task);
+      if (taskList[index].startTime > task.startTime) {
+        taskList.splice(index, 0, task);
         break;
       }
 
     // wenn der Startzeitpunkt der neuen und der spätesten angezeigten aufgabe gleich sind,
     // die späteste Aufgabe entfernen. -> Diese wird in korrekter Reihenfolge nachgeladen
-    for (var delCnt = 0; this.last()?.startTime === task.startTime; delCnt++) {
-      this.pop();
+    for (var delCnt = 0; taskList.last()?.startTime === task.startTime; delCnt++) {
+      taskList.pop();
     }
 
     // Gelöschte Aufgaben erneut laden, damit nicht weniger als zuvor angezeigt wird.

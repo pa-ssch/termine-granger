@@ -9,7 +9,6 @@ export class TaskList extends Array<Task> {
     private dataService: DataService
   ) {
     super();
-
     taskUpdateService.getObservable().subscribe(this.addOrChange);
 
     this.loadData();
@@ -43,6 +42,7 @@ export class TaskList extends Array<Task> {
       if (this[oldTaskIndex].isDone !== task.isDone) {
         // Wenn sich der abgeschlossen-Status geändert hat, aufgabe entfernen,
         // da offene & abgeschlossene Aufgaben nie gemeinsam angezeigt werden.
+        this.splice(oldTaskIndex, 1);
         return;
       } else if (this[oldTaskIndex].startTime === task.startTime) {
         // Wenn die Startzeit gleich ist, wird keine umsortierung benötigt

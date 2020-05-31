@@ -10,7 +10,7 @@ export class Task {
   private _priority: uint2 = 1;
   private _isVisible?: boolean;
   private _isBlocker: boolean;
-  private _isDoneDate: string = "";
+  private _isDoneDate?: string;
   private _parentId: number = 0;
 
   public get taskId(): number {

@@ -9,9 +9,10 @@ export class TaskList extends Array<Task> {
     private dataService: DataService
   ) {
     super();
-    taskUpdateService.getObservable().subscribe((task) => this.addOrChange(task, this));
-
-    this.loadData();
+    if (taskUpdateService && dataService) {
+      taskUpdateService.getObservable().subscribe((task) => this.addOrChange(task, this));
+      this.loadData();
+    }
   }
 
   loadData(event?: any, count?: number) {
@@ -30,7 +31,7 @@ export class TaskList extends Array<Task> {
     return this[this.length - 1];
   }
 
-  addOrChange(task: Task, taskList: TaskList) {
+  private addOrChange(task: Task, taskList: TaskList) {
     // Nur Aufgaben mit gleichem Parent können in einer Liste gespeichert werden
     if (task.parentId !== taskList.tId) return;
 
@@ -38,9 +39,10 @@ export class TaskList extends Array<Task> {
     var oldTaskIndex = taskList.findIndex((t) => t.taskId === task.taskId);
     // Wenn die Aufgabe geändert wurde, änderungen übernehmen
     if (oldTaskIndex > -1) {
-      if (taskList[oldTaskIndex].isDone !== task.isDone) {
-        // Wenn sich der abgeschlossen-Status geändert hat, aufgabe entfernen,
-        // da offene & abgeschlossene Aufgaben nie gemeinsam angezeigt werden.
+      if (!taskList.isListable(task)) {
+        // Die Aufgabe entspricht nichtmehr den Bedingungen der liste.
+        // z.B. wurde die Aufgabe als erledigt markiert, oder das Datum ist außerhalb des Bereichs
+        taskList.splice(oldTaskIndex, 1);
         return;
       } else if (taskList[oldTaskIndex].startTime === task.startTime) {
         // Wenn die Startzeit gleich ist, wird keine umsortierung benötigt
@@ -69,5 +71,14 @@ export class TaskList extends Array<Task> {
     // Ansonsten könnten die fehlenden Aufgaben nicht nachgeladen werden, falls bereits
     // ans Ende gescrollt wurde
     this.loadData(undefined, delCnt + 1);
+  }
+
+  /**
+   * Prüft, ob ein bestimmter Task zu den Filteroptionen der Liste passt
+   * @param task Task, für welchen geprüft wird, ob er Teil der Liste sein darf.
+   */
+  private isListable(task: Task): boolean {
+    // Aktuell sind nur tasks anzeigbar, die noch nicht abgehakt sind.
+    return task.parentId == this.tId && !task.isDone;
   }
 }

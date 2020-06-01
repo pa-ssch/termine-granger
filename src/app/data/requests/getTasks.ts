@@ -26,7 +26,7 @@ export async function getTasks(
         return (skip = 0);
       }
 
-      tasks.push(req.result.value);
+      tasks.push(Object.assign(new Task(), req.result.value));
       cnt--;
       req.result.continue();
     };

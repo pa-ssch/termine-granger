@@ -15,10 +15,11 @@ import { HomePage } from "./home.page";
     RouterModule.forChild([
       {
         path: "",
-        component: HomePage
-      }
-    ])
+        component: HomePage,
+      },
+    ]),
   ],
-  declarations: [HomePage, TaskListComponent, TaskComponent]
+  declarations: [HomePage, TaskListComponent, TaskComponent],
+  exports: [TaskListComponent, TaskComponent],
 })
 export class HomePageModule {}

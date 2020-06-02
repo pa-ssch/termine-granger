@@ -13,6 +13,6 @@ import { TaskListComponent } from "src/app/_components/task-list/task-list.compo
 
 @NgModule({
   imports: [CommonModule, FormsModule, IonicModule, ListPageRoutingModule, HomePageModule],
-  declarations: [ListPage, TaskListComponent, TaskComponent],
+  declarations: [ListPage],
 })
 export class ListPageModule {}

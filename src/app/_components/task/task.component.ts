@@ -25,7 +25,6 @@ export class TaskComponent {
     if (this.task.isDone !== event.target.checked) {
       this.task.isDone = event.target.checked;
       this.dataService.updateTask(this.task);
-      this.taskUpdateService.publish(this.task);
     }
   }
 }

@@ -22,4 +22,11 @@ export class TaskListComponent {
   }
 
   constructor(private taskUpdateService: GlobalTaskUpdateService, private dataService: DataService) {}
+
+  refresh(event: any) {
+    this.taskList = new TaskList(this._tId, this.taskUpdateService, this.dataService);
+
+    // 50 ms warten, da der user bei schnellem laden nicht sieht, dass aktualisiert wurde
+    setTimeout(() => event.target.complete(), 50);
+  }
 }

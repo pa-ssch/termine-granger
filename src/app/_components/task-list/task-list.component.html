@@ -1,10 +1,16 @@
-<ion-list>
-  <app-task *ngFor="let t of taskList" [task]="t"></app-task>
-</ion-list>
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
 
-<ion-infinite-scroll (ionInfinite)="taskList.loadData($event)">
-  <ion-infinite-scroll-content
-    loadingSpinner="Dots"
-    loadingText="Loading more data..."
-  ></ion-infinite-scroll-content>
-</ion-infinite-scroll>
+  <ion-list>
+    <app-task *ngFor="let t of taskList" [task]="t"></app-task>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="taskList.loadData($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="Dots"
+      loadingText="Loading more data..."
+    ></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

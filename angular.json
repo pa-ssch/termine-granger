@@ -40,7 +40,7 @@
                 "input": "src/global.scss"
               }
             ],
-            "scripts": [],
+            "scripts": ["src/assets/js/notification.js"],
             "sourceMap": {
               "scripts": true,
               "styles": true,

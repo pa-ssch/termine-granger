@@ -19,14 +19,10 @@ import { environment } from "../environments/environment";
     IonicModule.forRoot(),
     AppRoutingModule,
     ServiceWorkerModule.register("ngsw-worker.js", {
-      enabled: environment.production
-    })
+      enabled: environment.production,
+    }),
   ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
-  ],
-  bootstrap: [AppComponent]
+  providers: [StatusBar, SplashScreen, { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  bootstrap: [AppComponent],
 })
 export class AppModule {}

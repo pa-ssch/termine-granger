@@ -1,9 +1,13 @@
 import { Component } from "@angular/core";
 
-import { Platform, ToastController } from "@ionic/angular";
+import { Platform, ToastController, AlertController } from "@ionic/angular";
 import { SplashScreen } from "@ionic-native/splash-screen/ngx";
 import { StatusBar } from "@ionic-native/status-bar/ngx";
-import { DataService } from "./data/data.service";
+
+//#region JS Methods
+declare function injectToastController(toastController): any;
+declare function injectAlertController(alertController): any;
+//#endregion JS Methods
 
 @Component({
   selector: "app-root",
@@ -15,9 +19,12 @@ export class AppComponent {
     private platform: Platform,
     private splashScreen: SplashScreen,
     private statusBar: StatusBar,
-    public toastController: ToastController
+    toastController: ToastController,
+    alertController: AlertController
   ) {
     this.initializeApp();
+    injectToastController(toastController);
+    injectAlertController(alertController);
   }
 
   initializeApp() {

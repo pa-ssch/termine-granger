@@ -1,27 +1,34 @@
-async function AddPushNotification(id, text, time, toastController, alertController) {
-  sendPush(id, text, time, toastController, alertController);
+var toastController;
+function injectToastController(tController) {
+  toastController = tController;
 }
 
-async function sendPush(id, text, time, toastController, alertController) {
-  
-  const reg;
+var alertController;
+function injectAlertController(aController) {
+  alertController = aController;
+}
+
+async function planNotification(id, title, text, time) {
+  const reg = await navigator.serviceWorker.getRegistration();
 
   Notification.requestPermission().then((permission) => {
     if (
-      navigator.userAgent.indexOf("Chrome") < 0 ||
-      permission !== "granted" ||
-      !("serviceWorker" in navigator) ||
-      !(reg = await navigator.serviceWorker.getRegistration()) ||
-      !("showTrigger" in Notification.prototype)
+      !(
+        navigator.userAgent.indexOf("Chrome") < 0 ||
+        permission !== "granted" ||
+        !("serviceWorker" in navigator) ||
+        !("showTrigger" in Notification.prototype) ||
+        !reg
+      )
     ) {
-      showNotificationErrorToast(toastController, alertController);
+      showErrorToast();
       return;
     }
 
-    reg.showNotification("Scheduled Push Notification", {
+    reg.showNotification(title, {
       tag: id,
       body: text,
-      showTrigger: new TimestampTrigger(time + 6000),
+      showTrigger: new TimestampTrigger(time),
       data: {
         url: window.location.href,
       },
@@ -31,7 +38,7 @@ async function sendPush(id, text, time, toastController, alertController) {
   });
 }
 
-async function showNotificationErrorToast(toastController, alertController) {
+async function showErrorToast() {
   const toast = await toastController.create({
     color: "danger",
     // duration: 5000, -> Dauerhaft anzeigen
@@ -40,23 +47,23 @@ async function showNotificationErrorToast(toastController, alertController) {
     buttons: [
       {
         icon: "help",
-        handler: () => showHelp(alertController)
+        handler: () => showHelp(),
       },
       {
         icon: "close",
-        role: "cancel"
+        role: "cancel",
       },
     ],
   });
   await toast.present();
 }
 
-async function showHelp(alertController) {
+async function showHelp() {
   const alert = await alertController.create({
     header: "Push-Benachrichtigungen nicht verfügbar.",
     message:
-      "Der Seite muss das Senden von Benachrichtigungen erlaubt werden und es wird der Browser Google Chrome benötigt. " +
-      "Ab Version 80 muss das Flag '#enable-experimental-web-platform-features' in 'chrome://flags' aktiviert werden.",
+      "Der Seite muss das Senden von Benachrichtigungen erlaubt werden und es wird die neuste Version von Google Chrome benötigt. \r\n\r\n" +
+      "Bei älteren Versionen kann es helfen, das Flag '#enable-experimental-web-platform-features' in 'chrome://flags' zu aktivieren.",
     buttons: ["OK"],
   });
 

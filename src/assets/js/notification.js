@@ -12,16 +12,16 @@ async function planNotification(id, title, text, time) {
   const reg = await navigator.serviceWorker.getRegistration();
 
   Notification.requestPermission().then((permission) => {
-    if (
-      !(
-        navigator.userAgent.indexOf("Chrome") < 0 ||
-        permission !== "granted" ||
-        !("serviceWorker" in navigator) ||
-        !("showTrigger" in Notification.prototype) ||
-        !reg
-      )
-    ) {
-      showErrorToast();
+    let errorHelpText = "";
+
+    if (permission !== "granted")
+      errorHelpText += "Das Senden von Benachrichtigungen muss erlaubt werden. \r\n\r\n";
+
+    if (navigator.userAgent.indexOf("Chrome") < 0 || !("showTrigger" in Notification.prototype))
+      errorHelpText += "Es wird die aktuellste Version von Google Chrome benötigt.\r\n\r\n";
+
+    if (errorHelpText.length > 0 || !("serviceWorker" in navigator) || !reg) {
+      showErrorToast(errorHelpText);
       return;
     }
 
@@ -38,16 +38,16 @@ async function planNotification(id, title, text, time) {
   });
 }
 
-async function showErrorToast() {
+async function showErrorToast(errorHelpText) {
   const toast = await toastController.create({
     color: "danger",
     // duration: 5000, -> Dauerhaft anzeigen
     header: "Erinnerungen nicht verfügbar",
-    message: "Der Browser unterstützt keine Push-Benachrichtigungen, oder die Funktion ist nicht aktiviert.",
+    message: "Push-Benachrichtigungen sind nicht verfügbar.",
     buttons: [
       {
         icon: "help",
-        handler: () => showHelp(),
+        handler: () => showHelp(errorHelpText),
       },
       {
         icon: "close",
@@ -58,12 +58,10 @@ async function showErrorToast() {
   await toast.present();
 }
 
-async function showHelp() {
+async function showHelp(errorText) {
   const alert = await alertController.create({
     header: "Push-Benachrichtigungen nicht verfügbar.",
-    message:
-      "Der Seite muss das Senden von Benachrichtigungen erlaubt werden und es wird die neuste Version von Google Chrome benötigt. \r\n\r\n" +
-      "Bei älteren Versionen kann es helfen, das Flag '#enable-experimental-web-platform-features' in 'chrome://flags' zu aktivieren.",
+    message: errorText,
     buttons: ["OK"],
   });
 

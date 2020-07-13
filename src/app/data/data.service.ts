@@ -4,6 +4,7 @@ import { getTask } from "./requests/getTask";
 import { getTasks } from "./requests/getTasks";
 import { Injectable } from "@angular/core";
 import { getChildrenCount } from "./requests/getChildrenCount";
+import { searchTasks } from "./requests/searchTasks";
 
 @Injectable({
   providedIn: "root",
@@ -18,6 +19,7 @@ export class DataService {
   public getTask = getTask;
   public getTasks = getTasks;
   public getChildrenCount = getChildrenCount;
+  public searchTasks = searchTasks;
 
   protected undoneTaskKeyRange(tId: number): IDBKeyRange {
     // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
@@ -62,19 +64,18 @@ export class DataService {
   private async createOrUpgrade() {
     var db = this.openReq.result;
     var ts = db.createObjectStore("TASK", {
-      keyPath: "taskId",
+      keyPath: "_taskId",
       autoIncrement: true,
     });
-    ts.createIndex("IX_TASK_ID_UNIQUE", "taskId", { unique: true });
-    ts.createIndex("IX_TASK_START_DATE", ["parentId", "isDoneDate", "startTime"]);
-    // ts.createIndex("IX_TASK_EXT_SRC", "extSourceLink");
-    // evtl. isBlocker & prio
+    ts.createIndex("IX_TASK_ID_UNIQUE", "_taskId", { unique: true });
+    ts.createIndex("IX_TASK_START_DATE", ["_parentId", "_isDoneDate", "_startTime"]);
+    ts.createIndex("IX_TASK_FILTER", ["_isDoneDate", "_startTime", "_title"]);
 
     var rs = db.createObjectStore("REMINDER", {
-      keyPath: "reminderId",
+      keyPath: "_reminderId",
       autoIncrement: true,
     });
-    rs.createIndex("IX_REMINDER_ID_UNIQUE", "reminderId", { unique: true });
-    rs.createIndex("IX_REMINDER_DATE", ["taskId", "reminderTime"]);
+    rs.createIndex("IX_REMINDER_ID_UNIQUE", "_reminderId", { unique: true });
+    rs.createIndex("IX_REMINDER_DATE", ["_taskId", "_reminderTime"]);
   }
 }

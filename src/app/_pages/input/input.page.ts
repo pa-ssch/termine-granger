@@ -28,9 +28,9 @@ export class InputPage implements OnInit {
     var tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
     this.reminderList = [];
     if (tId > 0) {
-      this.dataService.getTask(tId).then((t) => (this.task = t));
+      this.dataService.getTask(tId).then((t) => Object.assign(this.task, t));
       this.dataService.getReminder(tId).then((r) => {
-        this.reminderList = r;
+        this.reminderList = r.map((d) => Object.assign(new Reminder(), d));
         // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
         this.reminderList.push(new Reminder());
       });

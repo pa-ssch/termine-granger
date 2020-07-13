@@ -12,7 +12,7 @@ declare function planNotification(id, title, text, time): any;
 export class HomePage implements OnInit {
   constructor() {}
   ngOnInit(): void {
-    // Ein Beispiel zum Senden einer Benachrichtigung:
+    // Ein Beispiel zum Senden einer Benachrichtigung  (kommt in remidner speichermethode).
     planNotification(1, "Lernen", "eine Aufgabe steht an!", new Date().getTime() + 10000);
   }
 }

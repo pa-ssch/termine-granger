@@ -20,7 +20,7 @@ export class TaskList extends Array<Task> {
 
     this.dataService.getTasks(this.tId, this.length, count).then((taskList) => {
       console.log(taskList.length + " Aufgabe(n) geladen");
-      taskList.forEach((task) => this.push(task));
+      taskList.forEach((task) => this.push(Object.assign(new Task(), task)));
       if (taskList.length < count && event) event.target.disabled = true;
     });
 

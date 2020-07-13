@@ -8,9 +8,17 @@ function injectAlertController(aController) {
   alertController = aController;
 }
 
+// Plan macht update oder neu
+// abortNotification löscht eine geplante erinnerung
+
+async function abortNotification(id) {
+  const reg = await navigator.serviceWorker.getRegistration();
+  if (reg) (await reg.getNotifications({ includeTriggered: true, tag: id })).forEach((n) => n.close());
+}
+
 async function planNotification(id, title, text, time) {
   const reg = await navigator.serviceWorker.getRegistration();
-
+  console.log("abc");
   Notification.requestPermission().then((permission) => {
     let errorHelpText = "";
 
@@ -25,16 +33,25 @@ async function planNotification(id, title, text, time) {
       return;
     }
 
-    reg.showNotification(title, {
-      tag: id,
-      body: text,
-      showTrigger: new TimestampTrigger(time),
-      data: {
-        url: window.location.href,
-      },
-      // badge: "./assets/badge.png",
-      // icon: "./assets/icon.png",
-    });
+    const notification = reg.getNotifications({ includeTriggered: true, tag: id });
+
+    if (notification[0]) {
+      // Diese Erinnerung wurde bereits geplant. Es hat sich möglicherweiße eine Eigenschaft geändert
+      notification.title = title;
+      notification.body = text;
+      notification.showTrigger = new TimestampTrigger(time);
+    } else {
+      reg.showNotification(title, {
+        tag: id,
+        body: text,
+        showTrigger: new TimestampTrigger(time),
+        data: {
+          url: window.location.href,
+        },
+        // badge: "./assets/badge.png",
+        // icon: "./assets/icon.png",
+      });
+    }
   });
 }
 

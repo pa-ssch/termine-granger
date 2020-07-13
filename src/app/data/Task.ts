@@ -42,7 +42,7 @@ export class Task {
   }
 
   public set startTime(value: string) {
-    if (new Date(value).toISOString() === value) this._startTime = value;
+    if (new Date(value).toISOString() === value && value) this._startTime = value;
   }
 
   public get duration(): number {

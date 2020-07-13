@@ -38,14 +38,12 @@ export async function updateTask(this: DataService, task: Task, reminder?: Remin
           let reminderReq = rs.put(r);
           reminderReq.addEventListener("success", () => {
             r.reminderId = +reminderReq.result.valueOf();
-            console.log("a");
             planNotification(
               r.reminderId,
               task.title,
-              "Startzeit: " + new Date(task.startTime).toLocaleDateString(),
+              "Startzeit: " + new Date(task.startTime).toLocaleString(),
               r.reminderTime
             );
-            console.log("b");
           });
         });
       };

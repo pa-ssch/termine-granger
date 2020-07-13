@@ -102,9 +102,11 @@
       <ion-label>Funktionen</ion-label>
     </ion-item>
     <ion-card-content>
-      <ion-button expand="block">Split</ion-button>
-      <ion-button expand="block">IsDone</ion-button>
-      <ion-button expand="block">Change Group</ion-button>
+      <ion-button expand="block" (click)="split()">Aufteilen</ion-button>
+      <ion-button expand="block" (click)="setIsDone()">Als erledigt markieren</ion-button>
+      <ion-button expand="block" (click)="findStarttime()">Automatischen Startzeitpunkt bestimmen</ion-button>
+      <ion-button expand="block" (click)="createChild()">Unteraufgabe hinzufügen</ion-button>
+      <ion-button expand="block" (click)="changeGroup()">Überaufgabe ändern</ion-button>
     </ion-card-content>
   </ion-card>
 

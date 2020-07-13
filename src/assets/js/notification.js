@@ -8,17 +8,15 @@ function injectAlertController(aController) {
   alertController = aController;
 }
 
-// Plan macht update oder neu
-// abortNotification löscht eine geplante erinnerung
-
 async function abortNotification(id) {
+  // Geplante Erinnerungen entfernen
   const reg = await navigator.serviceWorker.getRegistration();
   if (reg) (await reg.getNotifications({ includeTriggered: true, tag: id })).forEach((n) => n.close());
 }
 
 async function planNotification(id, title, text, time) {
   const reg = await navigator.serviceWorker.getRegistration();
-  console.log("abc");
+
   Notification.requestPermission().then((permission) => {
     let errorHelpText = "";
 
@@ -48,8 +46,6 @@ async function planNotification(id, title, text, time) {
         data: {
           url: window.location.href,
         },
-        // badge: "./assets/badge.png",
-        // icon: "./assets/icon.png",
       });
     }
   });

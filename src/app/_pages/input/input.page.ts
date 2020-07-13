@@ -78,4 +78,18 @@ export class InputPage implements OnInit {
       () => (this.task.deadLineTime = null)
     );
   }
+  //#region Funktionen
+
+  split() {}
+
+  setIsDone() {
+    this.task.isDone = true;
+    this.saveAndClose();
+  }
+
+  findStarttime() {}
+  createChild() {}
+  changeGroup() {}
+
+  //#endregion Funktionen
 }

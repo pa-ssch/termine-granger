@@ -105,12 +105,18 @@
       <ion-button expand="block" (click)="split()">Aufteilen</ion-button>
       <ion-button expand="block" (click)="setIsDone()">Als erledigt markieren</ion-button>
       <ion-button expand="block" (click)="findStarttime()">Automatischen Startzeitpunkt bestimmen</ion-button>
-      <ion-button expand="block" (click)="createChild()">Unteraufgabe hinzufügen</ion-button>
-      <ion-button expand="block" (click)="changeGroup()">Überaufgabe ändern</ion-button>
+      <ion-button expand="block" (click)="createChild()" [disabled]="!task.taskId"
+        >Unteraufgabe hinzufügen</ion-button
+      >
+
+      <ion-item>
+        <ion-label>Gruppe: </ion-label>
+        <ion-select [(ngModel)]="task.parentId" okText="Ändern" cancelText="Abbrechen" default>
+          <ion-select-option *ngFor="let p of potentialParents" [value]="p.taskId"
+            >{{p.title}}</ion-select-option
+          >
+        </ion-select>
+      </ion-item>
     </ion-card-content>
   </ion-card>
-
-  <!-- 
-    todo ionic 5: Padding left bei Android liste, ios titel-input und beiden time-dropdowns 
- -->
 </ion-content>

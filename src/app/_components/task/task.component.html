@@ -1,7 +1,7 @@
 <ion-item-sliding>
   <ion-item
-    [routerLink]="childCount > 0 ? ['/list/', task.taskId] : ''"
-    routerDirection="forward"
+    [routerLink]="childCount > 0 ? ['/list/', task.taskId] : null"
+    [routerDirection]="childCount > 0 ? 'forward' : null"
     [detail]="childCount > 0"
   >
     <ion-checkbox

@@ -31,17 +31,17 @@ export class DatetimeComponent implements OnInit {
     return {
       buttons: [
         {
-          text: "Clear",
+          text: "Leeren",
           selected: true,
           role: "clear",
           handler: clearHandler,
         },
         {
-          text: "Cancel",
+          text: "Abbrechen",
           role: "cancel",
         },
         {
-          text: "Done",
+          text: "Okay",
           handler: doneHandler,
         },
       ],

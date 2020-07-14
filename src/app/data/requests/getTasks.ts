@@ -9,12 +9,16 @@ export async function getTasks(
 ): Promise<Task[]> {
   await this.dbReadyPromise();
 
-  var req = this.db
-    .transaction("TASK", "readonly")
-    .objectStore("TASK")
-    .index("IX_TASK_START_DATE")
-    .openCursor(this.undoneTaskKeyRange(+parentId));
-
+  var req: IDBRequest<IDBCursorWithValue>;
+  if (parentId != null) {
+    req = this.db
+      .transaction("TASK", "readonly")
+      .objectStore("TASK")
+      .index("IX_TASK_START_DATE")
+      .openCursor(this.undoneTaskKeyRange(+parentId));
+  } else {
+    req = this.db.transaction("TASK", "readonly").objectStore("TASK").openCursor();
+  }
   var tasks: Task[] = [];
 
   return await new Promise<Task[]>((res, rej) => {

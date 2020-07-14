@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
+import { DataService } from "src/app/data/data.service";
+import { Task } from "src/app/data/task";
 
 @Component({
   selector: "app-list",
@@ -7,13 +9,13 @@ import { ActivatedRoute } from "@angular/router";
   styleUrls: ["./list.page.scss"],
 })
 export class ListPage implements OnInit {
+  task: Task;
   tId: number;
-  constructor(private activatedRoute: ActivatedRoute) {}
+  constructor(private activatedRoute: ActivatedRoute, private dataService: DataService) {}
 
   ngOnInit() {
+    this.task = new Task();
     this.tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
-
-    alert("hier muss noch korrekt implemntiert  werden -> sodass tId gesetzt ist");
-    alert("unterliste lädt evtl id nicht richtig...");
+    if (this.tId) this.dataService.getTask(this.tId).then((t) => Object.assign(this.task, t));
   }
 }

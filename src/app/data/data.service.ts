@@ -5,6 +5,7 @@ import { getTasks } from "./requests/getTasks";
 import { Injectable } from "@angular/core";
 import { getChildrenCount } from "./requests/getChildrenCount";
 import { searchTasks } from "./requests/searchTasks";
+import { tick } from "@angular/core/testing";
 
 @Injectable({
   providedIn: "root",
@@ -34,10 +35,13 @@ export class DataService {
   //#region promises
   protected dbReadyPromise() {
     return new Promise((res) => {
+      console.log(this.openReq.readyState);
+
       if (this.db) res();
       else if (this.openReq && this.openReq.readyState !== "done")
         this.openReq.onsuccess = () => {
           if (!this.db) this.db = this.openReq.result;
+          console.log("ss");
           res();
         };
     });

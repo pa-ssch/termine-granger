@@ -9,7 +9,7 @@ export class Task {
   private _deadLineTime?: string;
   private _priority: uint2 = 1;
   private _isVisible?: boolean;
-  private _isBlocker: boolean;
+  private _isBlocker: boolean = true;
   private _isDoneDate: string = "";
   private _parentId: number = 0;
 
@@ -91,7 +91,7 @@ export class Task {
 
   set isDone(check: boolean) {
     if (check && !this.isDone) this._isDoneDate = new Date().toISOString();
-    else if (!check) this._isDoneDate = null;
+    else if (!check) this._isDoneDate = "";
   }
 
   public get parentId(): number {

@@ -2,6 +2,7 @@ import { DataService } from "./../../data/data.service";
 import { Component, Input } from "@angular/core";
 import { Task } from "src/app/data/task";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
+import { getBestFitUnit } from "src/app/data/types/durationUnit";
 @Component({
   selector: "app-task",
   templateUrl: "./task.component.html",
@@ -26,5 +27,15 @@ export class TaskComponent {
       this.task.isDone = event.target.checked;
       this.dataService.updateTask(this.task);
     }
+  }
+
+  getTimeText(): string {
+    let unit = getBestFitUnit(this.task.duration);
+    let durationUnit = Math.floor(this.task.duration / unit.minutes);
+    return `${durationUnit} ${unit.label}`;
+  }
+
+  getDateText(): string {
+    return new Date(this.task.startTime).toLocaleDateString();
   }
 }

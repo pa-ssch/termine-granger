@@ -66,7 +66,7 @@ export class Task {
   }
 
   public set priority(value: uint2) {
-    this._priority = value;
+    this._priority = <uint2>+value;
   }
 
   public get isVisible(): boolean {

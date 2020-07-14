@@ -1,4 +1,4 @@
-import { durationUnit, getAllUnits } from "./../../data/types/durationUnit";
+import { durationUnit, getAllUnits, getBestFitUnit } from "./../../data/types/durationUnit";
 import { Component, Input, Output, EventEmitter } from "@angular/core";
 
 @Component({
@@ -25,15 +25,8 @@ export class DurationComponent {
       return;
     }
 
-    // Bei gesetzter Dauer in Minuten größtmögliche Einheit festelgen
-    // und die Minuten-Dauer in die neue Einheit umrechen
-    // --> Einheiten müssen nach Dauer (ASC) sortiert sein
-    for (let u of this.units) {
-      if (value % u.minutes > 0) break;
-
-      this.unit = u;
-      this.unitDuration = Math.floor(value / u.minutes);
-    }
+    this.unit = getBestFitUnit(value);
+    this.unitDuration = Math.floor(value / this.unit.minutes);
   }
 
   @Output()

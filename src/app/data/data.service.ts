@@ -35,13 +35,10 @@ export class DataService {
   //#region promises
   protected dbReadyPromise() {
     return new Promise((res) => {
-      console.log(this.openReq.readyState);
-
       if (this.db) res();
       else if (this.openReq && this.openReq.readyState !== "done")
         this.openReq.onsuccess = () => {
           if (!this.db) this.db = this.openReq.result;
-          console.log("ss");
           res();
         };
     });

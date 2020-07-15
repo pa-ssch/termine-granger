@@ -24,6 +24,7 @@ export class DatetimeComponent implements OnInit {
   }
 
   remove() {
+    this.time = null;
     this.pickerOptions.buttons.find((b) => b.role === "clear").handler();
   }
 

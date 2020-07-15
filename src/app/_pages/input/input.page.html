@@ -103,7 +103,9 @@
     </ion-item>
     <ion-card-content>
       <ion-button expand="block" (click)="split()" [disabled]="!task.taskId">Aufteilen</ion-button>
-      <ion-button expand="block" (click)="setIsDone()">Als erledigt markieren</ion-button>
+      <ion-button expand="block" (click)="setIsDone()" [disabled]="!task.taskId"
+        >Als erledigt markieren</ion-button
+      >
       <ion-button expand="block" (click)="findStarttime()">Automatischen Startzeitpunkt bestimmen</ion-button>
       <ion-button expand="block" (click)="createChild()" [disabled]="!task.taskId"
         >Unteraufgabe hinzufügen</ion-button

@@ -36,7 +36,6 @@ export class TaskList extends Array<Task> {
   }
 
   loadData(event?: any, count?: number) {
-    // Ein undefinierter oder negativer count bedeutet, dass alle Aufgaben geladen werden
     if (!count) count = -1;
 
     this.dataService
@@ -44,7 +43,9 @@ export class TaskList extends Array<Task> {
       .then((taskList) => {
         if (!this._sortAsc) taskList = taskList.reverse();
         taskList.forEach((task) => this.push(Object.assign(new Task(), task)));
-        if (taskList.length < count && event) event.target.disabled = true;
+        if (taskList.length < count && event) {
+          event.target.disabled = true;
+        }
       });
   }
 

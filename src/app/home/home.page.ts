@@ -31,7 +31,7 @@ export class HomePage {
     this.displaymodeUpdateService.publish(this.displaymode);
   }
 
-  async showSortPicker(ev: any) {
+  async showSortPicker() {
     const sortPicker = await this.pickerController.create({
       columns: [
         {

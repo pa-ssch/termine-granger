@@ -6,7 +6,6 @@ import { ActivatedRoute } from "@angular/router";
 import { Reminder } from "src/app/data/reminder";
 import { NavController, AlertController, ToastController } from "@ionic/angular";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
-import { relative } from "path";
 
 @Component({
   selector: "app-input",

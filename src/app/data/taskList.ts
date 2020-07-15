@@ -1,31 +1,51 @@
+import { displayMode } from "./types/displaymode";
 import { Task } from "./task";
 import { DataService } from "./data.service";
 import { GlobalTaskUpdateService } from "../events/global-task-update.service";
+import { GlobalDisplaymodeUpdateService } from "../events/global-displaymode-update.service";
+import { GlobalSortmodeUpdateService } from "../events/global-sortmode-update.service";
 
 export class TaskList extends Array<Task> {
+  private _indexName: string = "IX_TASK_START_DATE";
+  private _displayMode: displayMode = "undone";
+  private _sortAsc: boolean = true;
+
   constructor(
     private tId: number,
     taskUpdateService: GlobalTaskUpdateService,
-    private dataService: DataService
+    private dataService: DataService,
+    displaymodeUpdateService: GlobalDisplaymodeUpdateService,
+    sortmodeUpdateService: GlobalSortmodeUpdateService
   ) {
     super();
     if (taskUpdateService && dataService) {
       taskUpdateService.getObservable().subscribe((task) => this.addOrChange(task, this));
       this.loadData();
     }
+    if (displaymodeUpdateService) {
+      displaymodeUpdateService
+        .getObservable()
+        .subscribe((displaymode: displayMode) => this.displaymodeChanged(displaymode));
+    }
+
+    if (sortmodeUpdateService) {
+      sortmodeUpdateService
+        .getObservable()
+        .subscribe((sortmode) => this.sortmodeChanged(sortmode.sortDirectionIndex, sortmode.sortDbIndex));
+    }
   }
 
   loadData(event?: any, count?: number) {
-    // Ein count < 0 bedeutet, dass alle Aufgaben geladen werden
+    // Ein undefinierter oder negativer count bedeutet, dass alle Aufgaben geladen werden
     if (!count) count = -1;
 
-    this.dataService.getTasks(this.tId, this.length, count).then((taskList) => {
-      console.log(taskList.length + " Aufgabe(n) geladen");
-      taskList.forEach((task) => this.push(Object.assign(new Task(), task)));
-      if (taskList.length < count && event) event.target.disabled = true;
-    });
-
-    event?.target?.complete();
+    this.dataService
+      .getTasks(this.tId, this.length, count, this._indexName, this._displayMode)
+      .then((taskList) => {
+        if (!this._sortAsc) taskList = taskList.reverse();
+        taskList.forEach((task) => this.push(Object.assign(new Task(), task)));
+        if (taskList.length < count && event) event.target.disabled = true;
+      });
   }
 
   private last(): Task {
@@ -79,7 +99,31 @@ export class TaskList extends Array<Task> {
    * @param task Task, für welchen geprüft wird, ob er Teil der Liste sein darf.
    */
   private isListable(task: Task): boolean {
-    // Aktuell sind nur tasks anzeigbar, die noch nicht abgehakt sind.
-    return task.parentId == this.tId && !task.isDone;
+    return (
+      task.parentId == this.tId &&
+      ((task.isDone && this._displayMode == "done") || (!task.isDone && this._displayMode == "undone"))
+    );
+  }
+
+  public displaymodeChanged(displaymode: displayMode) {
+    if (displaymode !== this._displayMode) {
+      this._displayMode = displaymode;
+
+      // alle aktuellen Aufgaben entfernen
+      while (this.length > 0) this.pop();
+
+      this.loadData();
+    }
+  }
+
+  public sortmodeChanged(sortDirectionIndex: number, dbSortIndex: string) {
+    this._sortAsc = sortDirectionIndex !== 1;
+
+    this._indexName = dbSortIndex;
+
+    // alle aktuellen Aufgaben entfernen
+    while (this.length > 0) this.pop();
+
+    this.loadData();
   }
 }

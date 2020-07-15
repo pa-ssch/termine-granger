@@ -1,3 +1,4 @@
+import { displayMode } from "./../types/displaymode";
 import { DataService } from "../data.service";
 import { Task } from "../task";
 
@@ -5,7 +6,9 @@ export async function getTasks(
   this: DataService,
   parentId: number,
   skip?: number,
-  cnt: number = 0
+  cnt: number = 0,
+  indexName: string = "IX_TASK_START_DATE",
+  displayMode: displayMode = "undone"
 ): Promise<Task[]> {
   await this.dbReadyPromise();
 
@@ -14,8 +17,8 @@ export async function getTasks(
     req = this.db
       .transaction("TASK", "readonly")
       .objectStore("TASK")
-      .index("IX_TASK_START_DATE")
-      .openCursor(this.undoneTaskKeyRange(+parentId));
+      .index(indexName)
+      .openCursor(this.taskKeyRange(+parentId, displayMode));
   } else {
     req = this.db.transaction("TASK", "readonly").objectStore("TASK").openCursor();
   }

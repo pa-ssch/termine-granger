@@ -1,3 +1,4 @@
+import { displayMode } from "./types/displaymode";
 import { updateTask } from "./requests/updateTask";
 import { getReminder } from "./requests/getReminder";
 import { getTask } from "./requests/getTask";
@@ -22,9 +23,13 @@ export class DataService {
   public getChildrenCount = getChildrenCount;
   public searchTasks = searchTasks;
 
-  protected undoneTaskKeyRange(tId: number): IDBKeyRange {
-    // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
-    return IDBKeyRange.bound([tId, "", ""], [tId, "", "a"]);
+  protected taskKeyRange(tId: number, display: displayMode): IDBKeyRange {
+    // Die Range leeres Wort bis ÿ erlaubt alle unicode-Zeichenketten
+    if (display == "done") {
+      return IDBKeyRange.bound([tId, "0", ""], [tId, "9", "ÿÿÿÿ"]);
+    } else {
+      return IDBKeyRange.bound([tId, "", ""], [tId, "", "ÿÿÿÿ"]);
+    }
   }
 
   protected reminderForTaskKeyRange(tId: number): IDBKeyRange {
@@ -70,7 +75,9 @@ export class DataService {
     });
     ts.createIndex("IX_TASK_ID_UNIQUE", "_taskId", { unique: true });
     ts.createIndex("IX_TASK_START_DATE", ["_parentId", "_isDoneDate", "_startTime"]);
-    ts.createIndex("IX_TASK_FILTER", ["_isDoneDate", "_startTime", "_title"]);
+    ts.createIndex("IX_TASK_DEADLINE", ["_parentId", "_isDoneDate", "_deadLineTime"]);
+    ts.createIndex("IX_TASK_TITLE", ["_parentId", "_isDoneDate", "_title"]);
+    ts.createIndex("IX_TASK_PRIORITY", ["_parentId", "_isDoneDate", "_priority"]);
 
     var rs = db.createObjectStore("REMINDER", {
       keyPath: "_reminderId",

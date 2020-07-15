@@ -1,4 +1,4 @@
-import { uint2 } from "./types/uints";
+import { uint2 } from "./types/uint2";
 
 export class Task {
   private _taskId?: number;

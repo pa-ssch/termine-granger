@@ -6,7 +6,7 @@
   >
     <ion-checkbox
       [checked]="task.isDone"
-      [indeterminate]="childCount > 0 || task.isDone"
+      [indeterminate]="childCount > 0"
       [class]="childCount > 0 ? 'readonly' : ''"
       [color]="childCount > 0 ? 'medium' : 'primary'"
       (ionChange)="checkedChanged($event)"

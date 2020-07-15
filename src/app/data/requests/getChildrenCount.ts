@@ -8,6 +8,6 @@ export async function getChildrenCount(this: DataService, parentId: number): Pro
       .transaction("TASK", "readonly")
       .objectStore("TASK")
       .index("IX_TASK_START_DATE")
-      .count(this.undoneTaskKeyRange(+parentId))
+      .count(this.taskKeyRange(+parentId, "undone"))
   );
 }

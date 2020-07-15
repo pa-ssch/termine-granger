@@ -106,6 +106,7 @@ export class TaskList extends Array<Task> {
   }
 
   public displaymodeChanged(displaymode: displayMode) {
+    console.log("test");
     if (displaymode !== this._displayMode) {
       this._displayMode = displaymode;
 

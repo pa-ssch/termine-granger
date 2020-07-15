@@ -25,7 +25,7 @@ export class TaskList extends Array<Task> {
       if (taskList.length < count && event) event.target.disabled = true;
     });
 
-    event?.target.complete();
+    event?.target?.complete();
   }
 
   private last(): Task {

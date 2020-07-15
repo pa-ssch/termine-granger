@@ -110,10 +110,7 @@ export class TaskList extends Array<Task> {
     if (displaymode !== this._displayMode) {
       this._displayMode = displaymode;
 
-      // alle aktuellen Aufgaben entfernen
-      while (this.length > 0) this.pop();
-
-      this.loadData();
+      this.reload();
     }
   }
 
@@ -121,7 +118,10 @@ export class TaskList extends Array<Task> {
     this._sortAsc = sortDirectionIndex !== 1;
 
     this._indexName = dbSortIndex;
+    this.reload();
+  }
 
+  public reload() {
     // alle aktuellen Aufgaben entfernen
     while (this.length > 0) this.pop();
 

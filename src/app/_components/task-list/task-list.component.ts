@@ -37,13 +37,7 @@ export class TaskListComponent {
   ) {}
 
   refresh(event: any) {
-    this.taskList = new TaskList(
-      this._tId,
-      this.taskUpdateService,
-      this.dataService,
-      this.displaymodeUpdateService,
-      this.sortmodeUpdateService
-    );
+    this.taskList.reload();
 
     // 50 ms warten, da der user bei schnellem laden nicht sieht, dass aktualisiert wurde
     setTimeout(() => event.target.complete(), 50);

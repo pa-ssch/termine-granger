@@ -13,7 +13,6 @@
     ></ion-checkbox>
 
     <ion-label padding-start>{{ task.title }}</ion-label>
-    <!-- <ion-icon [name]="task.priority == 0 ? 'arrow-down-circle' : 'arrow-up-circle'" [class]="'priority-' + task.priority" *ngIf="!(childCount > 0) && task.priority != 1"></ion-icon> -->
     <ion-badge class="right-badge" color="light" *ngIf="!(childCount > 0) && task.duration">{{
       getTimeText()
     }}</ion-badge>

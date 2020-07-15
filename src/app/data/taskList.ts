@@ -16,7 +16,8 @@ export class TaskList extends Array<Task> {
   }
 
   loadData(event?: any, count?: number) {
-    if (!count) count = 25;
+    // Ein count < 0 bedeutet, dass alle Aufgaben geladen werden
+    if (!count) count = -1;
 
     this.dataService.getTasks(this.tId, this.length, count).then((taskList) => {
       console.log(taskList.length + " Aufgabe(n) geladen");

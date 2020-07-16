@@ -54,7 +54,7 @@ async function planNotification(id, title, text, time) {
 async function showErrorToast(errorHelpText) {
   const toast = await toastController.create({
     color: "danger",
-    // duration: 5000, -> Dauerhaft anzeigen
+    duration: 5000,
     header: "Erinnerungen nicht verfügbar",
     message: "Push-Benachrichtigungen sind nicht verfügbar.",
     buttons: [

@@ -19,7 +19,8 @@ export class TaskComponent {
 
   @Input() set task(task: Task) {
     this._task = task;
-    this.dataService.getChildrenCount(+this.task.taskId).then((t) => (this.childCount = t));
+    if (this.task.taskId)
+      this.dataService.getChildrenCount(+this.task.taskId).then((t) => (this.childCount = t));
   }
 
   checkedChanged(event: any) {

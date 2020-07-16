@@ -112,8 +112,13 @@
       >
 
       <ion-item>
-        <ion-label>Gruppe: </ion-label>
-        <ion-select [(ngModel)]="task.parentId" okText="Ändern" cancelText="Abbrechen" default>
+        <ion-label>Gruppe wählen</ion-label>
+        <ion-select
+          [(ngModel)]="task.parentId"
+          okText="Ändern"
+          cancelText="Abbrechen"
+          [disabled]="!potentialParents?.length"
+        >
           <ion-select-option *ngFor="let p of potentialParents" [value]="p.taskId"
             >{{p.title}}</ion-select-option
           >

@@ -6,6 +6,7 @@ import { ActivatedRoute } from "@angular/router";
 import { Reminder } from "src/app/data/reminder";
 import { NavController, AlertController, ToastController } from "@ionic/angular";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
+import { stringify } from "querystring";
 
 @Component({
   selector: "app-input",
@@ -64,6 +65,15 @@ export class InputPage implements OnInit {
           this.potentialParents = this.potentialParents.filter((t) => taskIds.includes(t.parentId));
           var lengthAfterElimination = this.potentialParents.length;
         } while (lengthBeforeElimination !== lengthAfterElimination);
+        var dummyHeadTask = new Task();
+        dummyHeadTask.taskId = 0;
+        dummyHeadTask.title = "n. a.";
+        this.potentialParents.push(dummyHeadTask);
+        this.potentialParents = this.potentialParents.sort((a, b) => {
+          if (a.title === "n. a.") return -1;
+          if (b.title === "n. a.") return 1;
+          return a.title.localeCompare(b.title);
+        });
       });
     }
   }
@@ -156,6 +166,7 @@ export class InputPage implements OnInit {
   }
 
   calculatePotentialStarttime(task: Task, minStartDate: number, maxEndDate: number): string {
+    if (!task.duration) task.duration = 0;
     const ticksPerMinute = 60000;
     var minEndDate = minStartDate + task.duration * ticksPerMinute;
     var startTime: string;

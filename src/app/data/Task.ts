@@ -18,7 +18,7 @@ export class Task {
   }
 
   public set taskId(value: number) {
-    if (value) this._taskId = value;
+    this._taskId = value;
   }
 
   public get title(): string {
@@ -99,7 +99,7 @@ export class Task {
   }
 
   public set parentId(value: number) {
-    if (value) this._parentId = value;
+    this._parentId = value;
   }
 
   static compare(a: Task, b: Task): number {

@@ -9,7 +9,11 @@
 
 <ion-content>
   <app-task-list [tId]="tId"></app-task-list>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button [routerLink]="['/input/', 0, tId]" routerDirection="forward">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
-<ion-footer>
-  <ion-toolbar></ion-toolbar>
-</ion-footer>
+
+<!-- Footer mit Sortierung, etc. wie auf Hauptseite möglich, ist aber nicht gefordert-->

@@ -6,6 +6,7 @@ import { ActivatedRoute } from "@angular/router";
 import { Reminder } from "src/app/data/reminder";
 import { NavController, AlertController, ToastController } from "@ionic/angular";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
+import { start } from "repl";
 
 @Component({
   selector: "app-input",
@@ -77,15 +78,40 @@ export class InputPage implements OnInit {
     }
   }
 
-  saveAndClose() {
-    this.dataService
-      .updateTask(
-        this.task,
-        this.reminderList.filter((r) => r.reminderTime)
-      )
-      .then(() => this.taskUpdateService.publish(this.task));
+  async saveAndClose(force: boolean = false) {
+    let starttime = new Date(this.task.startTime).getTime();
+    if (!force && !this.calculatePotentialStarttime(this.task, starttime, starttime)) {
+      // Es gibt für die gewählte Startzeit einen Konflikt, Benutzer muss bestätigen
+      await this.showStarttimeConflictAlert();
+    } else {
+      this.dataService
+        .updateTask(
+          this.task,
+          this.reminderList.filter((r) => r.reminderTime)
+        )
+        .then(() => this.taskUpdateService.publish(this.task));
+      this.navCtrl.back();
+    }
+  }
 
-    this.navCtrl.back();
+  async showStarttimeConflictAlert() {
+    const alert = await this.alertController.create({
+      header: "Durchführungszeit Konflikt",
+      message:
+        "Die gewählte Startzeit steht in Konflikt mit andren Aufgaben. Möchten Sie trotzdem speichern?",
+      buttons: [
+        {
+          text: "Abbrechen",
+          role: "cancel",
+        },
+        {
+          text: "Speichern",
+          handler: () => this.saveAndClose(true),
+        },
+      ],
+    });
+
+    await alert.present();
   }
 
   getReminderPickerOptions(reminder: Reminder) {
@@ -173,7 +199,7 @@ export class InputPage implements OnInit {
     var startTime: string;
 
     // Startzeitfindung nur möglich, wenn das frühste ende vor dem spätesten Ende ist
-    if (minEndDate < maxEndDate) {
+    if (minEndDate <= maxEndDate) {
       startTime = new Date(minStartDate).toISOString();
       // Aufgaben, welche bezüglich der Durchführungszeit miteinander konkurrieren
       var competingTasks = this.allTasks

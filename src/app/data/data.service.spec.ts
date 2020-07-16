@@ -35,24 +35,4 @@ describe("dataService Testsuite", () => {
   it("Spec: load Tasklist complete", inject([DataService], (service: DataService) => {
     //expect(service).toBeTruthy();
   }));
-
-  it("Spec: load Tasklist fragmented", inject([DataService], (service: DataService) => {
-    //expect(service).toBeTruthy();
-  }));
-
-  it("Spec: search Task by Name", inject([DataService], (service: DataService) => {
-    //expect(service).toBeTruthy();
-  }));
-
-  it("Spec: search Task by Priority", inject([DataService], (service: DataService) => {
-    //expect(service).toBeTruthy();
-  }));
-
-  it("Spec: test reminder integrity", inject([DataService], (service: DataService) => {
-    //expect(service).toBeTruthy();
-  }));
-
-  it("Spec: test task integrity", inject([DataService], (service: DataService) => {
-    //expect(service).toBeTruthy();
-  }));
 });

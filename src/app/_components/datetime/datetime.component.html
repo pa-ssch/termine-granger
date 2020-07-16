@@ -10,6 +10,7 @@
     [pickerOptions]="pickerOptions"
     [min]="getMin()"
     [max]="getMax()"
+    [disabled]="readonly"
   ></ion-datetime>
 
   <!--
@@ -18,7 +19,14 @@
     und beim hinzufügen eines Zeitwertes unter dem DatetimePicker liegt
     -> Button könnte nichtmehr geklickt werden
   -->
-  <ion-button [hidden]="!time || placeholder == 'Start'" item-right clear (click)="remove()" slot="end">
+  <ion-button
+    [hidden]="!time || placeholder == 'Start'"
+    item-right
+    clear
+    (click)="remove()"
+    slot="end"
+    [disabled]="readonly"
+  >
     <ion-icon name="close" size="small"></ion-icon>
   </ion-button>
 </ion-item>

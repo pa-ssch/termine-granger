@@ -6,7 +6,6 @@ import { ActivatedRoute } from "@angular/router";
 import { Reminder } from "src/app/data/reminder";
 import { NavController, AlertController, ToastController } from "@ionic/angular";
 import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
-import { stringify } from "querystring";
 
 @Component({
   selector: "app-input",
@@ -36,8 +35,8 @@ export class InputPage implements OnInit {
       this.dataService.getTask(tId).then((t) => Object.assign(this.task, t));
       this.dataService.getReminder(tId).then((r) => {
         this.reminderList = r.map((d) => Object.assign(new Reminder(), d));
-        // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
-        this.reminderList.push(new Reminder());
+        // Ein neuer leerer Reminder ist als Platzhalter ("Hinzufügen...") benötigt, wenn die AUfgabe bearbeitet werden darf
+        if (!this.task.isDone) this.reminderList.push(new Reminder());
       });
     } else {
       // neu erstellen
@@ -69,10 +68,10 @@ export class InputPage implements OnInit {
         dummyHeadTask.taskId = 0;
         dummyHeadTask.title = "n. a.";
         this.potentialParents.push(dummyHeadTask);
-        this.potentialParents = this.potentialParents.sort((a, b) => {
-          if (a.title === "n. a.") return -1;
-          if (b.title === "n. a.") return 1;
-          return a.title.localeCompare(b.title);
+        this.potentialParents = this.potentialParents.sort((p1, p2) => {
+          if (p1.title === "n. a.") return -1;
+          if (p2.title === "n. a.") return 1;
+          return p1.title.localeCompare(p2.title);
         });
       });
     }
@@ -97,7 +96,9 @@ export class InputPage implements OnInit {
         // Datum ändern
         reminder.reminderTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString();
       },
-      () => (this.reminderList = this.reminderList.filter((r) => r !== reminder))
+      () => {
+        if (reminder.reminderTime) this.reminderList = this.reminderList.filter((r) => r !== reminder);
+      }
     );
   }
 
@@ -114,8 +115,8 @@ export class InputPage implements OnInit {
       () => (this.task.deadLineTime = null)
     );
   }
-  //#region Funktionen
 
+  //#region Funktionen
   setIsDone() {
     this.task.isDone = true;
     this.saveAndClose();
@@ -208,16 +209,6 @@ export class InputPage implements OnInit {
     return startTime;
   }
 
-  async showNoStartTimeFoundToast() {
-    const toast = await this.toastController.create({
-      color: "danger",
-      duration: 5000,
-      header: "Keine Startzeit möglich",
-      message: "Es konnte kein möglicher Durchführungszeitpunkt für die Aufgabe gefunden werden.",
-    });
-    await toast.present();
-  }
-
   /** Aufgabe in mehrere Teilaufgaben zerlegen und die Eigenschaften übertragen */
   async split() {
     // startZeit & Deadline müssen gesetzt sein, um den Durchführungszeitraum einzugernzen
@@ -273,9 +264,9 @@ export class InputPage implements OnInit {
       let startTime = new Date(this.task.startTime).getTime();
       let deadLine = new Date(this.task.deadLineTime).getTime();
 
-      for (var i = 1; i <= childCount; i++) {
+      for (var childIndex = 1; childIndex <= childCount; childIndex++) {
         var newTask = new Task();
-        newTask.title = `(${i}) ${this.task.title}`;
+        newTask.title = `(${childIndex}) ${this.task.title}`;
         newTask.duration = this.task.duration / childCount;
 
         var potentialStartTime = this.calculatePotentialStarttime(newTask, startTime, deadLine);
@@ -301,16 +292,16 @@ export class InputPage implements OnInit {
         .map((r) => new Date(r.reminderTime).getTime() - new Date(this.task.startTime).getTime());
 
       // Tasks & Reminder speichern
-      for (var i = 0; i < childList.length; i++) {
+      for (var childIndex = 0; childIndex < childList.length; childIndex++) {
         // Eigenschaften an das Kind übertragen
-        childList[i].priority = this.task.priority;
-        childList[i].parentId = this.task.taskId;
-        childList[i].isVisible = this.task.isVisible;
-        childList[i].isBlocker = this.task.isBlocker;
-        childList[i].description = this.task.description;
-        childList[i].deadLineTime = this.task.deadLineTime;
+        childList[childIndex].priority = this.task.priority;
+        childList[childIndex].parentId = this.task.taskId;
+        childList[childIndex].isVisible = this.task.isVisible;
+        childList[childIndex].isBlocker = this.task.isBlocker;
+        childList[childIndex].description = this.task.description;
+        childList[childIndex].deadLineTime = this.task.deadLineTime;
 
-        var childStarttime = new Date(childList[i].startTime).getTime();
+        var childStarttime = new Date(childList[childIndex].startTime).getTime();
         // Erinnerungen erstellen
         let childReminders: Reminder[] = relativeReminder.map((relativeReminderTime) => {
           let childReminder = new Reminder();
@@ -318,11 +309,23 @@ export class InputPage implements OnInit {
           return childReminder;
         });
 
-        this.dataService.updateTask(childList[i], childReminders);
+        this.dataService.updateTask(childList[childIndex], childReminders);
       }
 
       return true;
     } else return false;
+  }
+  //#endregion Funktionen
+
+  //#region Toasts
+  async showNoStartTimeFoundToast() {
+    const toast = await this.toastController.create({
+      color: "danger",
+      duration: 5000,
+      header: "Keine Startzeit möglich",
+      message: "Es konnte kein möglicher Durchführungszeitpunkt für die Aufgabe gefunden werden.",
+    });
+    await toast.present();
   }
 
   async showCantStartSplitToast() {
@@ -344,6 +347,5 @@ export class InputPage implements OnInit {
     });
     await toast.present();
   }
-
-  //#endregion Funktionen
+  //#endregion Toasts
 }

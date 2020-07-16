@@ -26,10 +26,9 @@ export class DataService {
     // Von dem leeren Wort bis zum ersten Symbol, das mehr als 8 Bit benötigt sind
     // bei Lexiographischer Ordnung alle unicode-Zeichenketten enthalten.
     let beyondUnicodeSymbol = String.fromCharCode(256);
-    if (display == "done" && tId === 0) {
-      return IDBKeyRange.bound(["", "0", ""], ["a", "a", beyondUnicodeSymbol]);
-    } else if (display == "done") {
-      return IDBKeyRange.bound([tId, "0", ""], [tId, "a", beyondUnicodeSymbol]);
+
+    if (display == "done") {
+      return IDBKeyRange.bound([tId, "0", ""], [tId, "A", beyondUnicodeSymbol]);
     } else {
       return IDBKeyRange.bound([tId, "", ""], [tId, "", beyondUnicodeSymbol]);
     }

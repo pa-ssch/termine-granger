@@ -109,4 +109,21 @@ export class Task {
 
     return 0;
   }
+
+  static compareByIndex(a: Task, b: Task, dbIndex: string): number {
+    switch (dbIndex) {
+      case "IX_TASK_START_DATE":
+        return a.startTime.localeCompare(b.startTime);
+      case "IX_TASK_DEADLINE":
+        return a.deadLineTime.localeCompare(b.deadLineTime);
+      case "IX_TASK_TITLE":
+        return a.title.localeCompare(b.title);
+      case "IX_TASK_PRIORITY":
+        let cmpResult = b.priority - a.priority;
+        if (cmpResult > 1) cmpResult = 1;
+        return cmpResult;
+      default:
+        return 0;
+    }
+  }
 }

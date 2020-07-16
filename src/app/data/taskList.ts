@@ -54,45 +54,44 @@ export class TaskList extends Array<Task> {
   }
 
   private addOrChange(task: Task, taskList: TaskList) {
-    // Nur Aufgaben mit gleichem Parent können in einer Liste gespeichert werden
-    if (task.parentId !== taskList.tId) return;
-
     // Falls die Aufgabe schon in der Liste ist, den Index des Eintrages heraussuchen
     var oldTaskIndex = taskList.findIndex((t) => t.taskId === task.taskId);
-    // Wenn die Aufgabe geändert wurde, änderungen übernehmen
+
+    // Nur Aufgaben mit gleichem Parent können in einer Liste gespeichert werden
+    if (task.parentId !== taskList.tId) {
+      if (oldTaskIndex > -1) taskList.splice(oldTaskIndex, 1);
+      return;
+    }
+
+    // Wenn die Aufgabe geändert wurde, änderungen übernehmen und korrekt einsortieren
     if (oldTaskIndex > -1) {
       if (!taskList.isListable(task)) {
-        // Die Aufgabe entspricht nichtmehr den Bedingungen der liste.
-        // z.B. wurde die Aufgabe als erledigt markiert, oder das Datum ist außerhalb des Bereichs
+        // Die Aufgabe entspricht nichtmehr den Bedingungen der liste (ist erledigt oder nichtmehr erledigt)
         taskList.splice(oldTaskIndex, 1);
+
         return;
-      } else if (taskList[oldTaskIndex].startTime === task.startTime) {
-        // Wenn die Startzeit gleich ist, wird keine umsortierung benötigt
+      } else if (Task.compareByIndex(taskList[oldTaskIndex], task, taskList._indexName) === 0) {
+        // Sortierkriterium ist gleich geblieben, keine umsortierung benötigt
         taskList[oldTaskIndex] = task;
         return;
       } else {
-        // Aufgabe entfernen, wenn sich der Startzeitpunkt geändert hat
+        // sortierkriterium hat sich geändert
+        // Die Aufgabe muss entfernt werden
         taskList.splice(oldTaskIndex, 1);
       }
     }
-
-    // Aufgabe hinzufügen, wenn sie im Bereich der angezeigten Aufgaben ist
-    for (var index: number = 0; this[index]; index++)
-      if (taskList[index].startTime > task.startTime) {
-        taskList.splice(index, 0, task);
+    // An der richtigen Stelle einfügen
+    for (let i = 0; i < taskList.length; i++) {
+      let cmpResult = Task.compareByIndex(taskList[i], task, taskList._indexName);
+      if (
+        (cmpResult > 0 && taskList._sortAsc) ||
+        (cmpResult < 0 && !taskList._sortAsc) ||
+        i == taskList.length - 1
+      ) {
+        taskList.splice(i, 0, task);
         break;
       }
-
-    // wenn der Startzeitpunkt der neuen und der spätesten angezeigten aufgabe gleich sind,
-    // die späteste Aufgabe entfernen. -> Diese wird in korrekter Reihenfolge nachgeladen
-    for (var delCnt = 0; taskList.last()?.startTime === task.startTime; delCnt++) {
-      taskList.pop();
     }
-
-    // Gelöschte Aufgaben erneut laden, damit nicht weniger als zuvor angezeigt wird.
-    // Ansonsten könnten die fehlenden Aufgaben nicht nachgeladen werden, falls bereits
-    // ans Ende gescrollt wurde
-    this.loadData(undefined, delCnt + 1);
   }
 
   /**
@@ -107,7 +106,6 @@ export class TaskList extends Array<Task> {
   }
 
   public displaymodeChanged(displaymode: displayMode) {
-    console.log("test");
     if (displaymode !== this._displayMode) {
       this._displayMode = displaymode;
 

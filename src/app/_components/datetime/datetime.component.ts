@@ -11,6 +11,7 @@ export class DatetimeComponent implements OnInit {
   @Input() placeholder: string;
   @Input() icon: string;
   @Input() pickerOptions: any;
+  @Input() readonly: boolean;
 
   constructor() {}
 
@@ -32,7 +33,7 @@ export class DatetimeComponent implements OnInit {
     return {
       buttons: [
         {
-          text: "Leeren",
+          text: "Löschen",
           selected: true,
           role: "clear",
           handler: clearHandler,

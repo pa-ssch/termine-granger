@@ -4,7 +4,6 @@
       <ion-back-button defaultHref="/home" [text]="'Back'"></ion-back-button>
     </ion-buttons>
     <ion-title>Eingabe</ion-title>
-    <!-- gruppe (label) evtl. als Chip -->
     <ion-buttons slot="end">
       <ion-button slot="end" (click)="saveAndClose()" [class.button-disabled]="!task.title">
         <ion-icon slot="icon-only" name="save"></ion-icon>
@@ -15,7 +14,12 @@
 
 <ion-content>
   <ion-card
-    ><ion-input placeholder="Titel" class="input-large" [(ngModel)]="task.title"></ion-input>
+    ><ion-input
+      placeholder="Titel"
+      class="input-large"
+      [(ngModel)]="task.title"
+      [readonly]="task.isDone"
+    ></ion-input>
   </ion-card>
 
   <ion-card>
@@ -24,7 +28,11 @@
     </ion-item>
 
     <ion-card-content>
-      <app-duration ngDefaultControl [(minuteDuration)]="task.duration"></app-duration>
+      <app-duration
+        ngDefaultControl
+        [(minuteDuration)]="task.duration"
+        [readonly]="task.isDone"
+      ></app-duration>
 
       <app-datetime
         [min]="task.startTime"
@@ -32,6 +40,7 @@
         placeholder="Deadline"
         [pickerOptions]="getDeadlinePickerOptions()"
         icon="golf"
+        [readonly]="task.isDone"
       ></app-datetime>
 
       <app-datetime
@@ -40,6 +49,7 @@
         placeholder="Start"
         [pickerOptions]="getStartdatePickerOptions()"
         icon="play"
+        [readonly]="task.isDone"
       ></app-datetime>
     </ion-card-content>
   </ion-card>
@@ -55,6 +65,7 @@
         [time]="r.reminderTime"
         [pickerOptions]="getReminderPickerOptions(r)"
         placeholder="Hinzufügen..."
+        [readonly]="task.isDone"
       ></app-datetime>
     </ion-card-content>
   </ion-card>
@@ -66,7 +77,7 @@
     <ion-card-content>
       <ion-item no-padding lines="full">
         <ion-icon name="alert-circle" slot="start"></ion-icon>
-        <ion-segment mode="ios" [(ngModel)]="task.priority">
+        <ion-segment mode="ios" [(ngModel)]="task.priority" [disabled]="task.isDone">
           <ion-segment-button value="0" layout="icon-bottom">
             <ion-icon name="arrow-down-circle"></ion-icon>
           </ion-segment-button>
@@ -86,13 +97,14 @@
           auto-grow="true"
           rows="1"
           placeholder="Hier Infos eingeben"
+          [readonly]="task.isDone"
         ></ion-textarea>
       </ion-item>
 
       <ion-item no-padding lines="none">
         <ion-icon name="shield" slot="start"></ion-icon>
         <ion-label>Ist Blocker</ion-label>
-        <ion-toggle [(ngModel)]="task.isBlocker"></ion-toggle>
+        <ion-toggle [(ngModel)]="task.isBlocker" [disabled]="task.isDone"></ion-toggle>
       </ion-item>
     </ion-card-content>
   </ion-card>
@@ -102,22 +114,26 @@
       <ion-label>Funktionen</ion-label>
     </ion-item>
     <ion-card-content>
-      <ion-button expand="block" (click)="split()" [disabled]="!task.taskId">Aufteilen</ion-button>
-      <ion-button expand="block" (click)="setIsDone()" [disabled]="!task.taskId"
+      <ion-button expand="block" (click)="split()" [disabled]="!task.taskId || task.isDone"
+        >Aufteilen</ion-button
+      >
+      <ion-button expand="block" (click)="setIsDone()" [disabled]="!task.taskId || task.isDone"
         >Als erledigt markieren</ion-button
       >
-      <ion-button expand="block" (click)="findStarttime()">Startzeit berechen</ion-button>
-      <ion-button expand="block" (click)="createChild()" [disabled]="!task.taskId"
+      <ion-button expand="block" (click)="findStarttime()" [disabled]="task.isDone"
+        >Startzeit berechen</ion-button
+      >
+      <ion-button expand="block" (click)="createChild()" [disabled]="!task.taskId || task.isDone"
         >Unteraufgabe hinzufügen</ion-button
       >
 
       <ion-item>
-        <ion-label>Gruppe wählen</ion-label>
+        <ion-label>Gruppe</ion-label>
         <ion-select
           [(ngModel)]="task.parentId"
           okText="Ändern"
           cancelText="Abbrechen"
-          [disabled]="!potentialParents?.length"
+          [disabled]="potentialParents?.length < 2 || task.isDone"
         >
           <ion-select-option *ngFor="let p of potentialParents" [value]="p.taskId"
             >{{p.title}}</ion-select-option

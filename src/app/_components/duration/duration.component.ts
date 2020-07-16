@@ -29,6 +29,7 @@ export class DurationComponent {
     this.unitDuration = Math.floor(value / this.unit.minutes);
   }
 
+  @Input() readonly: boolean;
   @Output()
   minuteDurationChange = new EventEmitter<number>();
 

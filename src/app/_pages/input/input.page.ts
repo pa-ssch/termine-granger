@@ -198,7 +198,7 @@ export class InputPage implements OnInit {
     var startTime: string;
 
     // Startzeitfindung nur möglich, wenn das frühste ende vor dem spätesten Ende ist
-    if (minEndDate <= maxEndDate) {
+    if (minEndDate <= maxEndDate || !maxEndDate) {
       startTime = new Date(minStartDate).toISOString();
       // Aufgaben, welche bezüglich der Durchführungszeit miteinander konkurrieren
       var competingTasks = this.allTasks
@@ -210,21 +210,30 @@ export class InputPage implements OnInit {
           new Date(competingTasks[i].startTime).getTime() + competingTasks[i].duration * ticksPerMinute;
 
         if (potentialStartTime < minStartDate) {
-          continue;
+          if (
+            competingTasks.length > i + 1 &&
+            minStartDate < new Date(competingTasks[i + 1].startTime).getTime()
+          ) {
+            // Der frühste Startzeitpunkt ist vor dem Beginn der folgenden Aufgabe.
+            // Daher ist der frühste Startzeitpunkt ein optinaler Startzeitpunkt
+            potentialStartTime = minStartDate;
+          } else {
+            continue;
+          }
         } else if (potentialStartTime > maxEndDate) {
           startTime = "";
           break;
         }
-
         let potentialEndTime = potentialStartTime + task.duration * ticksPerMinute;
 
         if (
-          potentialEndTime <= maxEndDate &&
-          (!competingTasks[i + 1] || new Date(competingTasks[i + 1].startTime).getTime() <= potentialEndTime)
+          (potentialEndTime <= maxEndDate || !maxEndDate) &&
+          (!competingTasks[i + 1] || new Date(competingTasks[i + 1].startTime).getTime() >= potentialEndTime)
         ) {
-          // der Potentielle Start und das potentielle ENde liegen im vom benutzer gewählten Bereich
+          // der Potentielle Start und das potentielle Ende liegen im vom benutzer gewählten Bereich
           // und die Zeitlich nächste Aufgabe beginnt erst nach dem potentiellen Ende.
           startTime = new Date(potentialStartTime).toISOString();
+          break;
         } else {
           startTime = "";
         }

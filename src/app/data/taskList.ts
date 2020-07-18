@@ -19,7 +19,7 @@ export class TaskList extends Array<Task> {
   ) {
     super();
     if (taskUpdateService && dataService) {
-      taskUpdateService.getObservable().subscribe((task) => this.addOrChange(task, this));
+      taskUpdateService.getObservable().subscribe((task) => TaskList.addOrChange(task, this));
       this.loadData();
     }
     if (displaymodeUpdateService) {
@@ -53,24 +53,24 @@ export class TaskList extends Array<Task> {
     return this[this.length - 1];
   }
 
-  private addOrChange(task: Task, taskList: TaskList) {
+  public static addOrChange(task: Task, taskList: TaskList) {
     // Falls die Aufgabe schon in der Liste ist, den Index des Eintrages heraussuchen
     var oldTaskIndex = taskList.findIndex((t) => t.taskId === task.taskId);
 
-    // Nur Aufgaben mit gleichem Parent können in einer Liste gespeichert werden
-    if (task.parentId !== taskList.tId) {
+    // Nur Aufgaben mit gleichem Parent und AZeigeart (erledigt & abgeschlossen)
+    // können in einer Liste gespeichert werden
+    if (
+      task.parentId !== taskList.tId ||
+      (task.isDone && taskList._displayMode == "undone") ||
+      (!task.isDone && taskList._displayMode == "done")
+    ) {
       if (oldTaskIndex > -1) taskList.splice(oldTaskIndex, 1);
       return;
     }
 
     // Wenn die Aufgabe geändert wurde, änderungen übernehmen und korrekt einsortieren
     if (oldTaskIndex > -1) {
-      if (!taskList.isListable(task)) {
-        // Die Aufgabe entspricht nichtmehr den Bedingungen der liste (ist erledigt oder nichtmehr erledigt)
-        taskList.splice(oldTaskIndex, 1);
-
-        return;
-      } else if (Task.compareByIndex(taskList[oldTaskIndex], task, taskList._indexName) === 0) {
+      if (Task.compareByIndex(taskList[oldTaskIndex], task, taskList._indexName) === 0) {
         // Sortierkriterium ist gleich geblieben, keine umsortierung benötigt
         taskList[oldTaskIndex] = task;
         return;
@@ -99,17 +99,6 @@ export class TaskList extends Array<Task> {
         break;
       }
     }
-  }
-
-  /**
-   * Prüft, ob ein bestimmter Task zu den Filteroptionen der Liste passt
-   * @param task Task, für welchen geprüft wird, ob er Teil der Liste sein darf.
-   */
-  private isListable(task: Task): boolean {
-    return (
-      task.parentId == this.tId &&
-      ((task.isDone && this._displayMode == "done") || (!task.isDone && this._displayMode == "undone"))
-    );
   }
 
   public displaymodeChanged(displaymode: displayMode) {

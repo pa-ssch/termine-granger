@@ -18,10 +18,23 @@ export class DatetimeComponent implements OnInit {
   ngOnInit() {}
 
   getMin(): string {
-    return this.min ? this.min : new Date().getFullYear() - 100 + "";
+    if (this.min) {
+      let date = new Date(this.min);
+      const ticksPerMinute = 60000;
+      date = new Date(date.getTime() - date.getTimezoneOffset() * ticksPerMinute);
+      // alert(date);
+      return date.toISOString();
+    }
+    return new Date().getFullYear() - 100 + "";
   }
   getMax(): string {
-    return this.max ? this.max : new Date().getFullYear() + 100 + "";
+    if (this.max) {
+      let date = new Date(this.max);
+      const ticksPerMinute = 60000;
+      date = new Date(date.getTime() - date.getTimezoneOffset() * ticksPerMinute);
+      return date.toISOString();
+    }
+    return new Date().getFullYear() + 100 + "";
   }
 
   remove() {

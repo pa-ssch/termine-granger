@@ -80,7 +80,14 @@ export class TaskList extends Array<Task> {
         taskList.splice(oldTaskIndex, 1);
       }
     }
-    // An der richtigen Stelle einfügen
+
+    // Wenn noch keine andere Aufgabe in der Liste ist einfach einfügen
+    if (taskList.length == 0) {
+      taskList.push(task);
+      return;
+    }
+
+    // Wenn schon AUfgaben in der Liste sind, an der richtigen Stelle einfügen
     for (let i = 0; i < taskList.length; i++) {
       let cmpResult = Task.compareByIndex(taskList[i], task, taskList._indexName);
       if (

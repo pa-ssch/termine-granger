@@ -42,7 +42,7 @@ export class Task {
   }
 
   public set startTime(value: string) {
-    if (new Date(value).toISOString() === value && value) this._startTime = value;
+    if (!value || (new Date(value).toISOString() === value && value)) this._startTime = value;
   }
 
   public get duration(): number {
@@ -58,7 +58,7 @@ export class Task {
   }
 
   public set deadLineTime(value: string) {
-    if (new Date(value).toISOString() === value) this._deadLineTime = value;
+    if (!value || new Date(value).toISOString() === value) this._deadLineTime = value;
   }
 
   public get priority(): uint2 {

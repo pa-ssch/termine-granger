@@ -1,7 +1,6 @@
 import { DataService } from "./../../data/data.service";
 import { Component, Input } from "@angular/core";
 import { Task } from "src/app/data/task";
-import { GlobalTaskUpdateService } from "src/app/events/global-task-update.service";
 import { getBestFitUnit } from "src/app/data/types/durationUnit";
 @Component({
   selector: "app-task",
@@ -11,7 +10,7 @@ import { getBestFitUnit } from "src/app/data/types/durationUnit";
 export class TaskComponent {
   _task: Task;
   childCount: number;
-  constructor(private taskUpdateService: GlobalTaskUpdateService, private dataService: DataService) {}
+  constructor(private dataService: DataService) {}
 
   get task(): Task {
     return this._task;

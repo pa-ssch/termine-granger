@@ -32,3 +32,11 @@ Löschen aller Daten:
 * In den DevTools (bei Chrome F12) kann die IndexedDB Datrenbank (TG_DB) gelöscht werden
   * Für diesen Schritt muss man sich auf einer Seite der Domain termine-granger.web.app befinden
 * Die Datenbank wird nach einer Aktualisierung der Seite neu erstellt
+
+
+## Sourcecode
+Der relevante Sourcecode befindet sich unter [src/app](src/app/)
+
+
+## Jasmine-Test
+Ein Exemplarischer Test für die Funktion `addOrChange` ([taskList](src/app/data/taskList.ts)) ist in der Datei [data.service.spec.ts](src/app/data/data.service.spec.ts)

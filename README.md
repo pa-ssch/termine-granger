@@ -25,11 +25,11 @@ Um schnell mehrere Aufgaben zu erstellen:
   3. Als Untergrenze die gewünschte Anzahl an aufgaben festlegen
   4. Obergrenze >= Untergrenze wählen
 * Unteraufgaben sind erstellt
-* Damit ist es nicht möglich Aufgaben auf oberster Ebene zu erstellen
+* So ist es leider nicht möglich, Aufgaben auf oberster Ebene zu erstellen
   * Einzelne Unteraufgaben können durch das ändern der Gruppe auf "n.a." auf die oberste Ebene verschoben werden
 
 Löschen aller Daten:
-* In den DevTools (bei Chrome F12) kann die IndexedDB Datrenbank (TG_DB) gelöscht werden
+* In den DevTools (bei Chrome F12) kann die IndexedDB Datenbank (TG_DB) gelöscht werden
   * Für diesen Schritt muss man sich auf einer Seite der Domain termine-granger.web.app befinden
 * Die Datenbank wird nach einer Aktualisierung der Seite neu erstellt
 

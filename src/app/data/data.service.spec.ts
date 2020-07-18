@@ -1,7 +1,6 @@
 import { uint2 } from "./types/uint2";
 import { Task } from "./task";
 import { TaskList } from "./taskList";
-import { getTasks } from "./requests/getTasks";
 
 describe("Testsuite: taskList.addOrChange", () => {
   it("Spec: Insert Task with wrong Parent", () => {
@@ -63,6 +62,7 @@ describe("Testsuite: taskList.addOrChange", () => {
     expect(doneTaskList.length).toBe(tasks.length - 1, "Change of 'done'-Task was not successful");
   });
 
+  // Andere lexiographisch geordnete Datenbank-Indizes analog
   describe("Database index ascending order: IX_TASK_START_DATE", () => {
     it("Spec: Insert Task", () => {
       // Testdaten
@@ -108,6 +108,7 @@ describe("Testsuite: taskList.addOrChange", () => {
     });
   });
 
+  // Andere lexiographisch geordnete Datenbank-Indizes analog
   describe("Database index descending order: IX_TASK_START_DATE", () => {
     it("Spec: Insert Task", () => {
       // Testdaten
@@ -197,6 +198,7 @@ describe("Testsuite: taskList.addOrChange", () => {
         );
     });
   });
+
   describe("Database index descending order: IX_TASK_PRIORITY", () => {
     it("Spec: Insert Task", () => {
       // Testdaten
@@ -243,6 +245,22 @@ describe("Testsuite: taskList.addOrChange", () => {
   });
 
   var getTestTasks = (): Task[] => {
+    var getTestTask = (
+      id: number,
+      title: string,
+      startTime: string,
+      deadlineTime: string,
+      priority: uint2
+    ): Task => {
+      return Object.assign(new Task(), {
+        taskId: id,
+        title: title,
+        startTime: startTime,
+        deadLineTime: deadlineTime,
+        priority: priority,
+      });
+    };
+
     let task1 = getTestTask(1, "c", "2020-01-01T00:00:00.000Z", "", 1);
     let task2 = getTestTask(2, "CCC", "2020-01-09T00:00:00.000Z", "2020-02-01T00:00:00.000Z", 2);
     let task3 = getTestTask(3, "a", "2020-01-20T00:00:00.000Z", "", 0);
@@ -252,21 +270,5 @@ describe("Testsuite: taskList.addOrChange", () => {
     let task7 = getTestTask(7, "B", "2020-01-07T00:00:00.000Z", "2021-01-01T00:00:00.000Z", 1);
 
     return [task1, task2, task3, task4, task5, task6, task7];
-  };
-
-  var getTestTask = (
-    id: number,
-    title: string,
-    startTime: string,
-    deadlineTime: string,
-    priority: uint2
-  ): Task => {
-    return Object.assign(new Task(), {
-      taskId: id,
-      title: title,
-      startTime: startTime,
-      deadLineTime: deadlineTime,
-      priority: priority,
-    });
   };
 });

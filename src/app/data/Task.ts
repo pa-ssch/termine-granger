@@ -119,7 +119,7 @@ export class Task {
       case "IX_TASK_TITLE":
         return a.title.localeCompare(b.title);
       case "IX_TASK_PRIORITY":
-        let cmpResult = b.priority - a.priority;
+        let cmpResult = a.priority - b.priority;
         if (cmpResult > 1) cmpResult = 1;
         return cmpResult;
       default:

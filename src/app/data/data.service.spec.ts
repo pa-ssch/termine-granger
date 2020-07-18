@@ -107,21 +107,139 @@ describe("Testsuite: taskList.addOrChange", () => {
         );
     });
   });
-  describe("Database index descending order: IX_TASK_START_DATE", () => {
-    it("Spec: Insert Task", () => {});
 
-    it("Spec: Update Task", () => {});
+  describe("Database index descending order: IX_TASK_START_DATE", () => {
+    it("Spec: Insert Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_START_DATE", _sortAsc: false });
+      let tasks = getTestTasks();
+
+      // Startbedingung
+      expect(taskList.length).toBe(0);
+
+      // Aufgaben nach und nach einfügen
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i + 1].startTime.localeCompare(taskList[i].startTime)).toBeLessThanOrEqual(
+          0,
+          `${taskList[i + 1].startTime} should not be before ${taskList[i].startTime}`
+        );
+    });
+
+    it("Spec: Update Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_START_DATE", _sortAsc: false });
+      let tasks = getTestTasks();
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // Startbedingung
+      expect(taskList.length).toBe(tasks.length);
+
+      // Sortierkriterium von Aufgabe ändern
+      let updatedTask = Object.assign(new Task(), taskList[0]);
+      updatedTask.startTime = taskList[taskList.length - 1].startTime;
+      TaskList.addOrChange(updatedTask, taskList);
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i + 1].startTime.localeCompare(taskList[i].startTime)).toBeLessThanOrEqual(
+          0,
+          `${taskList[i + 1].startTime} should not be before ${taskList[i].startTime}`
+        );
+    });
   });
 
   describe("Database index ascending order: IX_TASK_PRIORITY", () => {
-    it("Spec: Insert Task", () => {});
+    it("Spec: Insert Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_PRIORITY", _sortAsc: true });
+      let tasks = getTestTasks();
 
-    it("Spec: Update Task", () => {});
+      // Startbedingung
+      expect(taskList.length).toBe(0);
+
+      // Aufgaben nach und nach einfügen
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].priority - taskList[i + 1].priority).toBeLessThanOrEqual(
+          0,
+          `${taskList[i].priority} should not be before ${taskList[i + 1].priority}`
+        );
+    });
+
+    it("Spec: Update Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_PRIORITY", _sortAsc: true });
+      let tasks = getTestTasks();
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // Startbedingung
+      expect(taskList.length).toBe(tasks.length);
+
+      // Sortierkriterium von Aufgabe ändern
+      let updatedTask = Object.assign(new Task(), taskList[0]);
+      updatedTask.priority = taskList[taskList.length - 1].priority;
+      TaskList.addOrChange(updatedTask, taskList);
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].priority - taskList[i + 1].priority).toBeLessThanOrEqual(
+          0,
+          `${taskList[i].priority} should not be before ${taskList[i + 1].priority}`
+        );
+    });
   });
   describe("Database index descending order: IX_TASK_PRIORITY", () => {
-    it("Spec: Insert Task", () => {});
+    it("Spec: Insert Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_PRIORITY", _sortAsc: false });
+      let tasks = getTestTasks();
 
-    it("Spec: Update Task", () => {});
+      // Startbedingung
+      expect(taskList.length).toBe(0);
+
+      // Aufgaben nach und nach einfügen
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].priority - taskList[i + 1].priority).toBeGreaterThanOrEqual(
+          0,
+          `${taskList[i].priority} should not be before ${taskList[i + 1].priority}`
+        );
+    });
+
+    it("Spec: Update Task", () => {
+      // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_PRIORITY", _sortAsc: false });
+      let tasks = getTestTasks();
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
+      // Startbedingung
+      expect(taskList.length).toBe(tasks.length);
+
+      // Sortierkriterium von Aufgabe ändern
+      let updatedTask = Object.assign(new Task(), taskList[0]);
+      updatedTask.priority = taskList[taskList.length - 1].priority;
+      TaskList.addOrChange(updatedTask, taskList);
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].priority - taskList[i + 1].priority).toBeGreaterThanOrEqual(
+          0,
+          `${taskList[i].priority} should not be before ${taskList[i + 1].priority}`
+        );
+    });
   });
 
   var getTestTasks = (): Task[] => {

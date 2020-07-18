@@ -77,43 +77,37 @@ describe("Testsuite: taskList.addOrChange", () => {
       tasks.forEach((t) => TaskList.addOrChange(t, taskList));
 
       // sortierung Prüfen
-      for (let i = 0; i < taskList.length - 1; i++) {
-        expect(taskList[i].startTime.localeCompare(taskList[i + 1].startTime)).toBeLessThan(
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].startTime.localeCompare(taskList[i + 1].startTime)).toBeLessThanOrEqual(
           0,
           `${taskList[i].startTime} should not be before ${taskList[i + 1].startTime}`
         );
-      }
     });
 
     it("Spec: Update Task", () => {
       // Testdaten
+      let taskList = new TaskList(0, null, null, null, null);
+      Object.assign(taskList, { _indexName: "IX_TASK_START_DATE", _sortAsc: true });
+      let tasks = getTestTasks();
+      tasks.forEach((t) => TaskList.addOrChange(t, taskList));
+
       // Startbedingung
+      expect(taskList.length).toBe(tasks.length);
+
       // Sortierkriterium von Aufgabe ändern
+      let updatedTask = Object.assign(new Task(), taskList[0]);
+      updatedTask.startTime = taskList[taskList.length - 1].startTime;
+      TaskList.addOrChange(updatedTask, taskList);
+
+      // sortierung Prüfen
+      for (let i = 0; i < taskList.length - 1; i++)
+        expect(taskList[i].startTime.localeCompare(taskList[i + 1].startTime)).toBeLessThanOrEqual(
+          0,
+          `${taskList[i].startTime} should not be before ${taskList[i + 1].startTime}`
+        );
     });
   });
   describe("Database index descending order: IX_TASK_START_DATE", () => {
-    it("Spec: Insert Task", () => {});
-
-    it("Spec: Update Task", () => {});
-  });
-
-  describe("Database index ascending order: IX_TASK_DEADLINE", () => {
-    it("Spec: Insert Task", () => {});
-
-    it("Spec: Update Task", () => {});
-  });
-  describe("Database index descending order: IX_TASK_DEADLINE", () => {
-    it("Spec: Insert Task", () => {});
-
-    it("Spec: Update Task", () => {});
-  });
-
-  describe("Database index ascending order: IX_TASK_TITLE", () => {
-    it("Spec: Insert Task", () => {});
-
-    it("Spec: Update Task", () => {});
-  });
-  describe("Database index descending order: IX_TASK_TITLE", () => {
     it("Spec: Insert Task", () => {});
 
     it("Spec: Update Task", () => {});

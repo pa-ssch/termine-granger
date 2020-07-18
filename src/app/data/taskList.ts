@@ -87,15 +87,14 @@ export class TaskList extends Array<Task> {
       return;
     }
 
-    // Wenn schon AUfgaben in der Liste sind, an der richtigen Stelle einfügen
+    // Wenn schon Aufgaben in der Liste sind, an der richtigen Stelle einfügen
     for (let i = 0; i < taskList.length; i++) {
       let cmpResult = Task.compareByIndex(taskList[i], task, taskList._indexName);
-      if (
-        (cmpResult > 0 && taskList._sortAsc) ||
-        (cmpResult < 0 && !taskList._sortAsc) ||
-        i == taskList.length - 1
-      ) {
+      if ((cmpResult > 0 && taskList._sortAsc) || (cmpResult < 0 && !taskList._sortAsc)) {
         taskList.splice(i, 0, task);
+        break;
+      } else if (i == taskList.length - 1) {
+        taskList.push(task);
         break;
       }
     }

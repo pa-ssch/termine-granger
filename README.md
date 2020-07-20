@@ -16,6 +16,10 @@ Prototyp für den Kurs Softwareengineering I (3. + 4. Semester) an der DHBW Karl
   * Ob die Konfiguration erfolgreich war, lässt sich mit der offiziellen [demo](https://notification-triggers.glitch.me/) von [Web.dev](https://web.dev/notification-triggers/) überprüfen
 
 
+## Anleitung
+Die App ist intuitiv gestaltet, sodass (vorallem wenn die Anforderungen bekannt sind) eine Anleitung nicht nötig ist.
+Falls jedoch trotzdem Fragen auftreten, kann das Dokument [Anleitung.pdf](Anleitung.pdf) herbeigezogen werden.
+
 ## Demodaten
 Um schnell mehrere Aufgaben zu erstellen:
 * Eine neue Aufgabe erstellen (Titel erforderlich) und Speichern

@@ -1,6 +1,7 @@
 import { DataService } from "./../data.service";
 import { Reminder } from "../reminder";
 
+/** Liefert alle Erinnerungen einer Aufgabe */
 export async function getReminder(this: DataService, tId: number): Promise<Reminder[]> {
   await this.dbReadyPromise();
 

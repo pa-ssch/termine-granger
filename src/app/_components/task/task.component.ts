@@ -29,12 +29,14 @@ export class TaskComponent {
     }
   }
 
+  /** Liefert den Text für die Anzeige der Dauer */
   getTimeText(): string {
     let unit = getBestFitUnit(this.task.duration);
     let durationUnit = Math.floor(this.task.duration / unit.minutes);
     return `${durationUnit} ${unit.label}`;
   }
 
+  /** Liefert den Text für die Anzeige des Datums */
   getDateText(): string {
     return new Date(this.task.startTime).toLocaleDateString();
   }

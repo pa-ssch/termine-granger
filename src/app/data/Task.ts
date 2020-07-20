@@ -42,7 +42,16 @@ export class Task {
   }
 
   public set startTime(value: string) {
-    if (!value || (new Date(value).toISOString() === value && value)) this._startTime = value;
+    if (value && new Date(value)?.toISOString() === value) {
+      if (this.deadLineTime) {
+        const ticksPerMinute = 60000;
+        let minEnd = new Date(value).getTime() + +this.duration * ticksPerMinute;
+        let deadline = new Date(this.deadLineTime).getTime();
+        if (minEnd > deadline) return;
+      }
+
+      this._startTime = value;
+    }
   }
 
   public get duration(): number {
@@ -50,7 +59,14 @@ export class Task {
   }
 
   public set duration(value: number) {
-    if (value >= 0) this._duration = Math.round(value);
+    if (+value >= 0) {
+      const ticksPerMinute = 60000;
+      let minEnd = new Date(this.startTime).getTime() + +value * ticksPerMinute;
+
+      if (!this.deadLineTime || new Date(this.deadLineTime).getTime() >= minEnd) {
+        this._duration = Math.round(value);
+      }
+    }
   }
 
   public get deadLineTime(): string {
@@ -58,7 +74,17 @@ export class Task {
   }
 
   public set deadLineTime(value: string) {
-    if (!value || new Date(value).toISOString() === value) this._deadLineTime = value;
+    if (!value) {
+      this._deadLineTime = value;
+    } else {
+      let deadLine = new Date(value);
+      const ticksPerMinute = 60000;
+      let minEnd = new Date(this.startTime).getTime() + this.duration * ticksPerMinute;
+
+      if (deadLine && deadLine.getTime() >= minEnd) {
+        this._deadLineTime = value;
+      }
+    }
   }
 
   public get priority(): uint2 {
@@ -102,14 +128,12 @@ export class Task {
     this._parentId = value;
   }
 
+  /** Vergleicht Aufgaben anhand der Startzeit */
   static compare(a: Task, b: Task): number {
-    if (a.startTime > b.startTime) return 1;
-
-    if (a.startTime < b.startTime) return -1;
-
-    return 0;
+    return a.startTime.localeCompare(b.startTime);
   }
 
+  /** Vergleichsfunktion für Aufgaben anhand eines Datenbankindex */
   static compareByIndex(a: Task, b: Task, dbIndex: string): number {
     switch (dbIndex) {
       case "IX_TASK_START_DATE":

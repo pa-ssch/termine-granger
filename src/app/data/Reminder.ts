@@ -24,6 +24,6 @@ export class Reminder {
   }
 
   public set reminderTime(value: string) {
-    if (new Date(value).toISOString() === value) this._reminderTime = value;
+    if (!value || new Date(value).toISOString() === value) this._reminderTime = value;
   }
 }

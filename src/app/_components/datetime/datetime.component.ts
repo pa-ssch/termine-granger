@@ -17,6 +17,7 @@ export class DatetimeComponent implements OnInit {
 
   ngOnInit() {}
 
+  /** Bestimmt das frühstmögliche Datum */
   getMin(): string {
     if (this.min) {
       let date = new Date(this.min);
@@ -27,6 +28,8 @@ export class DatetimeComponent implements OnInit {
     }
     return new Date().getFullYear() - 100 + "";
   }
+
+  /** Bestimmt das spätest mögliche Datum */
   getMax(): string {
     if (this.max) {
       let date = new Date(this.max);
@@ -37,11 +40,13 @@ export class DatetimeComponent implements OnInit {
     return new Date().getFullYear() + 100 + "";
   }
 
+  /** Löscht die Eingabe */
   remove() {
     this.time = null;
     this.pickerOptions.buttons.find((b) => b.role === "clear").handler();
   }
 
+  /** Aktionsflächen für die Datumsauswahl. */
   static getPickerOptions(doneHandler: (d) => void, clearHandler: () => void) {
     return {
       buttons: [
@@ -63,6 +68,7 @@ export class DatetimeComponent implements OnInit {
     };
   }
 
+  /** Objekt des IONIC-Datetime-Pickers in ein TypeScript-Date-Objekt wandeln */
   static getDateFromPickerObject(d): Date {
     // Verhalten von Date Object (JS):
     //    Der Monat ist Index-Basiert. Der Tag Kalenderbasiert

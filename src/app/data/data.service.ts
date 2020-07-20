@@ -15,13 +15,17 @@ export class DataService {
   private openReq: IDBOpenDBRequest;
   protected db: IDBDatabase;
 
+  //#region dbRequestst
+  // Die Abfrage-Funktionen sind Teil dieser Klasse,
+  // sind jedoch aufgrund der Übersichtlichkeit in eigene Dateien ausgelagert.
   public getReminder = getReminder;
   public updateTask = updateTask;
   public getTask = getTask;
   public getTasks = getTasks;
   public getChildrenCount = getChildrenCount;
-  public searchTasks = searchTasks;
+  //#endregion dbRequestst
 
+  /** Liefert eine Keyrange für eine Datenbankabfrage von Aufgaben unter berücksichtigung des Parents und des displaymodes */
   protected taskKeyRange(tId: number, display: displayMode): IDBKeyRange {
     // Von dem leeren Wort bis zum ersten Symbol, das mehr als 8 Bit benötigt sind
     // bei Lexiographischer Ordnung alle unicode-Zeichenketten enthalten.
@@ -34,12 +38,16 @@ export class DataService {
     }
   }
 
+  /**  Liefert eine Keyrange für das Abfragen von Erinnerungen zu einer konkreten Aufgabe */
   protected reminderForTaskKeyRange(tId: number): IDBKeyRange {
     // Da lexiographische Sortierung, sind alle Daten zwischen leerem Wort und 'a'
     return IDBKeyRange.bound([tId, ""], [tId, "a"]);
   }
 
   //#region promises
+  /** Wird ausgelößt, sobald der Zugriff auf die DB möglich ist.
+   * Wird sofort ausgelößt, falls der zugriff bereits möglich ist.
+   */
   protected dbReadyPromise() {
     return new Promise((res) => {
       if (this.db) res();
@@ -51,6 +59,7 @@ export class DataService {
     });
   }
 
+  /** Wird ausgelößt, sobald ein request erfolgreich abgeschlossen werden konnte */
   protected requestPromise<T>(req: IDBRequest) {
     return new Promise<T>((res, rej) => {
       req.addEventListener("success", () => res(req.result));
@@ -60,6 +69,7 @@ export class DataService {
 
   //#endregion promises
 
+  /** Öffnet eine Datenbankverbindung zu der TermineGranger IndexedDb */
   private constructor() {
     // DB Verbindung öffnen
     var indxDb = self.indexedDB ? self.indexedDB : window.indexedDB;
@@ -68,7 +78,7 @@ export class DataService {
     this.openReq.addEventListener("error", () => console.log("[onerror]", this.openReq.error));
   }
 
-  /** Upgrade oder neue DB benötigt */
+  /** Erstellt oder upgraded die Datenbank */
   private async createOrUpgrade() {
     var db = this.openReq.result;
     var ts = db.createObjectStore("TASK", {

@@ -1,5 +1,6 @@
 import { DataService } from "./../data.service";
 
+/** Bestimmt die Anzahl der Kinder einer Aufgabe */
 export async function getChildrenCount(this: DataService, parentId: number): Promise<number> {
   await this.dbReadyPromise();
 

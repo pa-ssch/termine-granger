@@ -130,7 +130,7 @@ export class InputPage implements OnInit {
   getStartdatePickerOptions() {
     return DatetimeComponent.getPickerOptions(
       (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString()),
-      () => (this.task.startTime = null)
+      null
     );
   }
 
@@ -193,6 +193,21 @@ export class InputPage implements OnInit {
 
   calculatePotentialStarttime(task: Task, minStartDate: number, maxEndDate: number): string {
     if (!task.duration) task.duration = 0;
+
+    // Die Sekunden vom frühsten Startdatum wegrunden, da diese für das
+    // gesamte System nicht relevant sind
+    let minStartRounded = new Date(minStartDate);
+    minStartRounded.setSeconds(0);
+    minStartRounded.setMilliseconds(0);
+    minStartDate = minStartRounded.getTime();
+
+    // Die Sekunden vom spätesten Enddatum wegrunden, da diese für das
+    // gesamte System nicht relevant sind
+    let maxEndRounded = new Date(maxEndDate);
+    maxEndRounded.setSeconds(0);
+    maxEndRounded.setMilliseconds(0);
+    maxEndDate = maxEndRounded.getTime();
+
     const ticksPerMinute = 60000;
     var minEndDate = minStartDate + task.duration * ticksPerMinute;
     var startTime: string;
@@ -209,13 +224,13 @@ export class InputPage implements OnInit {
         let potentialStartTime =
           new Date(competingTasks[i].startTime).getTime() + competingTasks[i].duration * ticksPerMinute;
 
-        if (potentialStartTime < minStartDate) {
+        if (potentialStartTime <= minStartDate) {
           if (
             competingTasks.length > i + 1 &&
             minStartDate < new Date(competingTasks[i + 1].startTime).getTime()
           ) {
             // Der frühste Startzeitpunkt ist vor dem Beginn der folgenden Aufgabe.
-            // Daher ist der frühste Startzeitpunkt ein optinaler Startzeitpunkt
+            // Daher ist der frühste Startzeitpunkt ein optionaler Startzeitpunkt
             potentialStartTime = minStartDate;
           } else {
             continue;
@@ -230,7 +245,7 @@ export class InputPage implements OnInit {
           (potentialEndTime <= maxEndDate || !maxEndDate) &&
           (!competingTasks[i + 1] || new Date(competingTasks[i + 1].startTime).getTime() >= potentialEndTime)
         ) {
-          // der Potentielle Start und das potentielle Ende liegen im vom benutzer gewählten Bereich
+          // der Potentielle Start und das potentielle Ende liegen im vom Benutzer gewählten Bereich
           // und die Zeitlich nächste Aufgabe beginnt erst nach dem potentiellen Ende.
           startTime = new Date(potentialStartTime).toISOString();
           break;

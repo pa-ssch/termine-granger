@@ -22,15 +22,18 @@ export class HomePage {
     this.setSortmode(0, 0);
   }
 
+  /** Liefert den Header abhängig von dem Status (Offen/Erledigt) der Aufgeführten Aufgaben */
   getDisplaymodeText() {
     return this.displaymode == "undone" ? "Offene Aufgaben" : "Erledigte Aufgaben";
   }
 
+  /** Aktualisiert die Aufgaben abhängig vom Status (Offen/Erledigt) */
   displaymodeChanged(ev: any) {
     this.displaymode = ev.detail.value;
     this.displaymodeUpdateService.publish(this.displaymode);
   }
 
+  /** Öffnet ein Auswahlfenster für das wählen einer Sortierung. Wendet die Sortierung an. */
   async showSortPicker() {
     const sortPicker = await this.pickerController.create({
       columns: [
@@ -70,6 +73,7 @@ export class HomePage {
     await sortPicker.present();
   }
 
+  /** Wendet eine Sortierung auf die aktuell angezeigten Aufgaben an */
   setSortmode(direction: number, attribute: number) {
     if (this.sortDirectionIndex !== direction || this.sortAttributeIndex !== attribute) {
       this.sortDirectionIndex = direction;

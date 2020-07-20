@@ -1,3 +1,6 @@
+// Push Benachrichtigungs-Funktionen
+// In Java Skript-Funktion, da die nötige TypeScript Version probleme mit IONIC macht.
+
 var toastController;
 function injectToastController(tController) {
   toastController = tController;

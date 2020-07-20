@@ -5,7 +5,6 @@ import { getTask } from "./requests/getTask";
 import { getTasks } from "./requests/getTasks";
 import { Injectable } from "@angular/core";
 import { getChildrenCount } from "./requests/getChildrenCount";
-import { searchTasks } from "./requests/searchTasks";
 
 @Injectable({
   providedIn: "root",

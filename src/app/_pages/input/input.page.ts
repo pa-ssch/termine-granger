@@ -32,21 +32,22 @@ export class InputPage implements OnInit {
     var tId = +this.activatedRoute.snapshot.paramMap.get("taskId");
     this.reminderList = [];
     if (tId > 0) {
+      // Aufgabe aus der Datenbank laden
       this.dataService.getTask(tId).then((t) => Object.assign(this.task, t));
       this.dataService.getReminder(tId).then((r) => {
         this.reminderList = r.map((d) => Object.assign(new Reminder(), d));
-        // Ein neuer leerer Reminder ist als Platzhalter ("Hinzufügen...") benötigt, wenn die AUfgabe bearbeitet werden darf
+        // Ein neuer leerer Reminder ist als Platzhalter ("Hinzufügen...") benötigt, wenn die Aufgabe bearbeitet werden darf
         if (!this.task.isDone) this.reminderList.push(new Reminder());
       });
     } else {
-      // neu erstellen
+      // Neue Aufgabe erstellen
       this.task.parentId = +this.activatedRoute.snapshot.paramMap.get("parentTaskId");
 
-      // Ein neuer leerer Reminder ist als Platzhalter ("Add") benötigt
+      // Ein neuer leerer Reminder ist als Platzhalter ("Hinzufügen...") benötigt
       this.reminderList.push(new Reminder());
     }
 
-    // Alle Aufgaben laden
+    // Alle Aufgaben laden (für die Startzeitfindung und Gruppenzuweisung)
     if (!this.allTasks) {
       this.dataService.getTasks(null, null, -1).then((a) => {
         this.allTasks = a.map((t) => Object.assign(new Task(), t));
@@ -55,19 +56,25 @@ export class InputPage implements OnInit {
           (t) => t.parentId !== this.task.taskId && t.taskId !== this.task.taskId && !t.isDone
         );
 
+        // Alle Potentiellen Gruppen (=Parents) laden (für die Gruppenzuweisung)
         do {
-          // Alle Potentiellen Parents.
           var taskIds = this.potentialParents.map((p) => p.taskId);
           taskIds.push(0);
-          // Alle Tasks entfernen, deren Parent nicht in der liste ist
+
+          // Alle Aufgaben entfernen, deren Parent nicht in der liste ist
           var lengthBeforeElimination = this.potentialParents.length;
           this.potentialParents = this.potentialParents.filter((t) => taskIds.includes(t.parentId));
           var lengthAfterElimination = this.potentialParents.length;
         } while (lengthBeforeElimination !== lengthAfterElimination);
+
+        // Eine n.a. Aufgabe hinzufügen, um das Entfernen des Parents zu ermöglichen
         var dummyHeadTask = new Task();
         dummyHeadTask.taskId = 0;
         dummyHeadTask.title = "n. a.";
         this.potentialParents.push(dummyHeadTask);
+
+        // Die potentiellen Gruppen alphabetisch sortieren, n. a. immer an die erste
+        // stelle schieben.
         this.potentialParents = this.potentialParents.sort((p1, p2) => {
           if (p1.title === "n. a.") return -1;
           if (p2.title === "n. a.") return 1;
@@ -77,10 +84,14 @@ export class InputPage implements OnInit {
     }
   }
 
+  /** Speichert und schließt die Aufgabe.
+   * Wenn die Aufgabe in Konflikt mit anderen Aufgaben steht (Überlappende
+   * Blocker) wird dem Benutzer eine Meldung gezeigt.
+   */
   async saveAndClose(force: boolean = false) {
     let starttime = new Date(this.task.startTime).getTime();
     if (!force && !this.calculatePotentialStarttime(this.task, starttime, starttime)) {
-      // Es gibt für die gewählte Startzeit einen Konflikt, Benutzer muss bestätigen
+      // Es gibt für die gewählte Startzeit einen Konflikt, Benutzer muss die sein OK geben.
       await this.showStarttimeConflictAlert();
     } else {
       this.dataService
@@ -93,6 +104,9 @@ export class InputPage implements OnInit {
     }
   }
 
+  /** Dialog um den Benutzer auf einen Konflikt bei der Durchführungszeit hinzuweisen.
+   * Er kann trotz des Konflikts speichern, muss aber mit den Konsequenzen leben.
+   */
   async showStarttimeConflictAlert() {
     const alert = await this.alertController.create({
       header: "Durchführungszeit Konflikt",
@@ -113,6 +127,7 @@ export class InputPage implements OnInit {
     await alert.present();
   }
 
+  /** Speicher & Lösch Funktionen für die Auswahl von Erinnerungen*/
   getReminderPickerOptions(reminder: Reminder) {
     return DatetimeComponent.getPickerOptions(
       (d: any) => {
@@ -127,6 +142,7 @@ export class InputPage implements OnInit {
     );
   }
 
+  /** Speicherfunktion für die Auswhal der Startzeit (löschen ist hier nicht möglich) */
   getStartdatePickerOptions() {
     return DatetimeComponent.getPickerOptions(
       (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString()),
@@ -134,6 +150,7 @@ export class InputPage implements OnInit {
     );
   }
 
+  /** Speicher & Lösch Funktionen für die Auswahl der Deadline */
   getDeadlinePickerOptions() {
     return DatetimeComponent.getPickerOptions(
       (d: any) => (this.task.deadLineTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString()),
@@ -142,15 +159,22 @@ export class InputPage implements OnInit {
   }
 
   //#region Funktionen
+
+  /** Markiert die Aufgabe als Abgeschlossen, schließt und speichert. */
   setIsDone() {
     this.task.isDone = true;
     this.saveAndClose();
   }
 
+  /** Öffnet die Eingabemaske, um eine Unteraufgabe zu erstellen. */
   createChild() {
     this.navCtrl.navigateForward(`input/0/${this.task.taskId}`);
   }
 
+  /** Startet den Dialog für das finden einer möglichen Startzeit.
+   * Im Dialog können der frühste start und das späteste Ende angegeben werden.
+   * Im Anschluss wird versucht eine frühstmögliche Durchführungszeit zu bestimmen.
+   */
   async findStarttime() {
     const alert = await this.alertController.create({
       header: "Durchführungszeit finden",
@@ -191,6 +215,7 @@ export class InputPage implements OnInit {
     await alert.present();
   }
 
+  /** Berechnet die frühstmögliche Startzeit für eine Aufgabe unter beachtung einer unter- und Obergrenze */
   calculatePotentialStarttime(task: Task, minStartDate: number, maxEndDate: number): string {
     if (!task.duration) task.duration = 0;
 
@@ -258,7 +283,11 @@ export class InputPage implements OnInit {
     return startTime;
   }
 
-  /** Aufgabe in mehrere Teilaufgaben zerlegen und die Eigenschaften übertragen */
+  /** Aufgabe in mehrere Teilaufgaben zerlegen und die Eigenschaften übertragen.
+   * Die Parameter für die Zerlegung (Ober und Untergrenze für die Anzahl der Aufgaben) bestimmt
+   * der Benutzer über einen Dialog.
+   * Die Eingabemaske wird im Anschluss geschlossen.
+   */
   async split() {
     // startZeit & Deadline müssen gesetzt sein, um den Durchführungszeitraum einzugernzen
     if (!this.task.startTime || !this.task.deadLineTime) {
@@ -305,14 +334,21 @@ export class InputPage implements OnInit {
     await alert.present();
   }
 
+  /** Erstellt eine Anzahl an Unteraufgaben (liegt im MIN/MAX bereich)
+   * und überträgt die Unterstüzenden EIgenschaften an die neuen Kinder.
+   */
   cloneToChilds(minChildCount: number, maxChildCount: number): boolean {
     const ticksPerMinute = 60000;
     let childList: Task[] = [];
+
+    // Zunächst versuchen so wenig Aufgaben wie möglich zu erstellen
+    // Wenn nötig bis zum Maximum hochzählen.
     while (minChildCount <= maxChildCount) {
       let childCount = minChildCount;
       let startTime = new Date(this.task.startTime).getTime();
       let deadLine = new Date(this.task.deadLineTime).getTime();
 
+      // Für jedes benötigte Kind eine potentielle Startzeit ermitteln
       for (var childIndex = 1; childIndex <= childCount; childIndex++) {
         var newTask = new Task();
         newTask.title = `(${childIndex}) ${this.task.title}`;
@@ -325,6 +361,9 @@ export class InputPage implements OnInit {
           childList.push(newTask);
           startTime = new Date(potentialStartTime).getTime() + newTask.duration * ticksPerMinute;
         } else {
+          // Wenn keine Potentielle Startzeit gefunden werden konte, kann für
+          // die folgenden Kinder auch keine Startzeit gefunden werden.
+          // Daher muss versucht werden Mehere Aufgaben mit jeweils kürzerer Dauer zu erstellen.
           minChildCount++;
           break;
         }

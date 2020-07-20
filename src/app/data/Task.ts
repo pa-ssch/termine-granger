@@ -4,7 +4,7 @@ export class Task {
   private _taskId?: number;
   private _title: string = "";
   private _description?: string;
-  private _startTime?: string = new Date().toISOString();
+  private _startTime?: string = "";
   private _duration: number = 0;
   private _deadLineTime?: string;
   private _priority: uint2 = 1;
@@ -13,6 +13,14 @@ export class Task {
   private _isDoneDate: string = "";
   private _parentId: number = 0;
 
+  constructor() {
+    // Setzen des Verpflichtenden Attributes Starttime über den Konstruktor, da
+    // vom aktuellen Zeitpunkt die Sekunden & Milisekunden entfernt werden müssen.
+    let currentDate = new Date();
+    currentDate.setSeconds(0);
+    currentDate.setMilliseconds(0);
+    this._startTime = currentDate.toISOString();
+  }
   public get taskId(): number {
     return this._taskId;
   }

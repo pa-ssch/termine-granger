@@ -15,7 +15,7 @@ Prototyp für den Kurs Softwareengineering I (3. + 4. Semester) an der DHBW Karl
   * Des Weiteren müssen hierfür die "Experimental Web Platform features" über "chrome://flags" aktiviert werden
   * Ob die Konfiguration erfolgreich war, lässt sich mit der offiziellen [demo](https://notification-triggers.glitch.me/) von [Web.dev](https://web.dev/notification-triggers/) überprüfen
   
-Empfehlung: Google Chrome unter Windows und verwendung der Installierten Anwendung, nicht der Webseite.
+Empfehlung: Google Chrome unter Windows und verwendung der installierten Anwendung, nicht der Webseite.
 
 ## Anleitung
 Die App ist intuitiv gestaltet, sodass (vorallem wenn die Anforderungen bekannt sind) eine Anleitung nicht nötig ist.

@@ -30,7 +30,7 @@
     <ion-card-content>
       <app-duration
         ngDefaultControl
-        [minuteDuration]="task.duration"
+        [(minuteDuration)]="task.duration"
         (minuteDurationChange)="durationChanged($event)"
         [readonly]="task.isDone"
       ></app-duration>

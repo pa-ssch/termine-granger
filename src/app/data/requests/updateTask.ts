@@ -23,7 +23,12 @@ export async function updateTask(this: DataService, task: Task, reminder?: Remin
 
     // Wenn die Aufgabe einen Parent hat, kann vom Parent IsBlocker = false gesetzt werden,
     // Da eine Aufgabe mit Unteraufgaben kein Blocker sein kann
-    if (task.parentId) ts.put({ _taskId: task.parentId, _isBlocker: false });
+    if (task.parentId) {
+      this.requestPromise(ts.get(task.parentId)).then((parent: Task) => {
+        parent.isBlocker = false;
+        ts.put(parent);
+      });
+    }
 
     if (reminder) {
       // Erinnerungen aktualisieren

@@ -89,9 +89,13 @@ export class InputPage implements OnInit {
    * Blocker) wird dem Benutzer eine Meldung gezeigt.
    */
   async saveAndClose(force: boolean = false) {
+    const ticksPerMinute = 60000;
     let starttime = new Date(this.task.startTime).getTime();
-    if (!force && !this.calculatePotentialStarttime(this.task, starttime, starttime)) {
-      // Es gibt für die gewählte Startzeit einen Konflikt, Benutzer muss die sein OK geben.
+    if (
+      !force &&
+      !this.calculatePotentialStarttime(this.task, starttime, starttime + this.task.duration * ticksPerMinute)
+    ) {
+      // Es gibt für die gewählte Startzeit einen Konflikt, Benutzer muss sein OK geben.
       await this.showStarttimeConflictAlert();
     } else {
       this.dataService
@@ -252,7 +256,6 @@ export class InputPage implements OnInit {
     maxEndRounded.setSeconds(0);
     maxEndRounded.setMilliseconds(0);
     maxEndDate = maxEndRounded.getTime();
-
     const ticksPerMinute = 60000;
     var minEndDate = minStartDate + task.duration * ticksPerMinute;
     var startTime: string;
@@ -264,6 +267,12 @@ export class InputPage implements OnInit {
       var competingTasks = this.allTasks
         .filter((t) => t.taskId !== task.taskId && t.isBlocker)
         .sort(Task.compare);
+
+      // Versuchen eine Startzeit vor der ersten konkurrierenden Aufgabe zu finden
+      let potentialEndTime = minStartDate + task.duration * ticksPerMinute;
+      if (!competingTasks[0] || potentialEndTime <= new Date(competingTasks[0].startTime).getTime()) {
+        return startTime;
+      }
 
       for (let i = 0; i < competingTasks.length; i++) {
         let potentialStartTime =
@@ -284,7 +293,7 @@ export class InputPage implements OnInit {
           startTime = "";
           break;
         }
-        let potentialEndTime = potentialStartTime + task.duration * ticksPerMinute;
+        potentialEndTime = potentialStartTime + task.duration * ticksPerMinute;
 
         if (
           (potentialEndTime <= maxEndDate || !maxEndDate) &&

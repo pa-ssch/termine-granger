@@ -144,18 +144,38 @@ export class InputPage implements OnInit {
 
   /** Speicherfunktion für die Auswhal der Startzeit (löschen ist hier nicht möglich) */
   getStartdatePickerOptions() {
-    return DatetimeComponent.getPickerOptions(
-      (d: any) => (this.task.startTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString()),
-      null
-    );
+    return DatetimeComponent.getPickerOptions((d: any) => {
+      let startTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString();
+      this.task.startTime = startTime;
+      // Wenn die Startzeit nicht gesetzt werden konnte, ist die Integrität für den Durchführungszeitpunkt nicht eingehalten
+      if (this.task.startTime !== startTime) {
+        this.task.deadLineTime = null;
+        this.task.startTime = startTime;
+        this.showTimeNotPossibleToast();
+      }
+    }, null);
   }
 
   /** Speicher & Lösch Funktionen für die Auswahl der Deadline */
   getDeadlinePickerOptions() {
     return DatetimeComponent.getPickerOptions(
-      (d: any) => (this.task.deadLineTime = DatetimeComponent.getDateFromPickerObject(d)?.toISOString()),
+      (d: any) => {
+        let deadline = DatetimeComponent.getDateFromPickerObject(d)?.toISOString();
+        this.task.deadLineTime = deadline;
+        // Wenn die Deadline nicht gesetzt werden konnte, ist die Integrität für den Durchführungszeitpunkt nicht eingehalten
+        if (this.task.deadLineTime !== deadline) this.showTimeNotPossibleToast();
+      },
       () => (this.task.deadLineTime = null)
     );
+  }
+
+  durationChanged(value: number) {
+    this.task.duration = value;
+    if (this.task.duration !== value) {
+      this.showTimeNotPossibleToast();
+      this.task.deadLineTime = null;
+      this.task.duration = value;
+    }
   }
 
   //#region Funktionen
@@ -322,6 +342,7 @@ export class InputPage implements OnInit {
           handler: (alertData) => {
             if (this.cloneToChilds(alertData.min, alertData.max)) {
               this.reminderList = [];
+              this.task.isBlocker = false;
               this.saveAndClose();
             } else {
               this.showUnsuccessfulSplitToast();
@@ -432,6 +453,16 @@ export class InputPage implements OnInit {
       duration: 5000,
       header: "Aufteilen nicht möglich",
       message: "In dem gewählten Zeitraum ist nicht genug freie Zeit für die Unteraufgaben verfügbar.",
+    });
+    await toast.present();
+  }
+
+  async showTimeNotPossibleToast() {
+    const toast = await this.toastController.create({
+      color: "danger",
+      duration: 5000,
+      header: "Durchführungszeit nicht möglich",
+      message: "Bei der gewählten Startzeit und Dauer ist die Einhaltung der Deadline nicht möglich.",
     });
     await toast.present();
   }

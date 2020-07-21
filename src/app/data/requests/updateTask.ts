@@ -21,6 +21,10 @@ export async function updateTask(this: DataService, task: Task, reminder?: Remin
   this.requestPromise(ts.put(task)).then((res) => {
     task.taskId = +res.valueOf();
 
+    // Wenn die Aufgabe einen Parent hat, kann vom Parent IsBlocker = false gesetzt werden,
+    // Da eine Aufgabe mit Unteraufgaben kein Blocker sein kann
+    if (task.parentId) ts.put({ _taskId: task.parentId, _isBlocker: false });
+
     if (reminder) {
       // Erinnerungen aktualisieren
       var req = rs.index("IX_REMINDER_DATE").getAll(this.reminderForTaskKeyRange(task.taskId));

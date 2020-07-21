@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/home" [text]="'Back'"></ion-back-button>
+      <ion-back-button defaultHref="/home" [text]="'Zurück'"></ion-back-button>
     </ion-buttons>
     <ion-title>Eingabe</ion-title>
     <ion-buttons slot="end">
@@ -30,7 +30,8 @@
     <ion-card-content>
       <app-duration
         ngDefaultControl
-        [(minuteDuration)]="task.duration"
+        [minuteDuration]="task.duration"
+        (minuteDurationChange)="durationChanged($event)"
         [readonly]="task.isDone"
       ></app-duration>
 

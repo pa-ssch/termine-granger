@@ -23,7 +23,6 @@ export class DatetimeComponent implements OnInit {
       let date = new Date(this.min);
       const ticksPerMinute = 60000;
       date = new Date(date.getTime() - date.getTimezoneOffset() * ticksPerMinute);
-      // alert(date);
       return date.toISOString();
     }
     return new Date().getFullYear() - 100 + "";

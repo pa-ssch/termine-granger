@@ -174,7 +174,6 @@ export class InputPage implements OnInit {
   }
 
   durationChanged(value: number) {
-    this.task.duration = value;
     if (this.task.duration !== value) {
       this.showTimeNotPossibleToast();
       this.task.deadLineTime = null;

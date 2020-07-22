@@ -52,15 +52,18 @@ export async function updateTask(this: DataService, task: Task, reminder?: Remin
           reminderReq.addEventListener("success", () => {
             r.reminderId = +reminderReq.result.valueOf();
             let starttime = new Date(task.startTime);
-            // Eine geplante Push-Benachrichtigung erstellen
-            planNotification(
-              r.reminderId,
-              "Eine Aufgabe steht an!",
-              `${
-                task.title
-              } am ${starttime.toLocaleDateString()} um ${starttime.getHours()}:${starttime.getMinutes()} Uhr.`,
-              new Date(r.reminderTime).getTime()
-            );
+            // Eine geplante Push-Benachrichtigung erstellen, wenn der Erinnerungszeitpunkt in der Zukunft liegt
+            let reminderTime = new Date(r.reminderTime).getTime();
+            if (reminderTime > starttime.getTime()) {
+              planNotification(
+                r.reminderId,
+                "Eine Aufgabe steht an!",
+                `${
+                  task.title
+                } am ${starttime.toLocaleDateString()} um ${starttime.getHours()}:${starttime.getMinutes()} Uhr.`,
+                reminderTime
+              );
+            }
           });
         });
       };

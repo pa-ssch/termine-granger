@@ -8,7 +8,7 @@
     min="0"
     [readonly]="readonly"
   ></ion-input>
-  <ion-select [(ngModel)]="unit.key" (ionChange)="change()" interface="popover" [disabled]="readonly">
-    <ion-select-option *ngFor="let u of units" [value]="u.key">{{ u.label }}</ion-select-option>
+  <ion-select [(ngModel)]="unit" (ionChange)="change()" interface="popover" [disabled]="readonly">
+    <ion-select-option *ngFor="let u of units" [value]="u">{{ u.label }}</ion-select-option>
   </ion-select>
 </ion-item>

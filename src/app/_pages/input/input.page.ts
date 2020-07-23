@@ -279,11 +279,12 @@ export class InputPage implements OnInit {
 
         if (potentialStartTime <= minStartDate) {
           if (
-            competingTasks.length > i + 1 &&
-            minStartDate < new Date(competingTasks[i + 1].startTime).getTime()
+            (competingTasks.length > i + 1 &&
+              minStartDate < new Date(competingTasks[i + 1].startTime).getTime()) ||
+            competingTasks.length == i + 1
           ) {
-            // Der frühste Startzeitpunkt ist vor dem Beginn der folgenden Aufgabe.
-            // Daher ist der frühste Startzeitpunkt ein optionaler Startzeitpunkt
+            // Der frühste Startzeitpunkt ist vor dem Beginn der folgenden Aufgabe, oder es folgt
+            // keine Aufgabe. Daher ist der frühste Startzeitpunkt ein optionaler Startzeitpunkt
             potentialStartTime = minStartDate;
           } else {
             continue;

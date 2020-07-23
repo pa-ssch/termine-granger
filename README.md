@@ -8,7 +8,7 @@ Aufgabenplanung und -verwaltung
 
 
 ## Installation
-* Die App ist mit allen Browsern, die PWAs unterstützen aufrufbar
+* Die App ist mit allen Browsern, die PWAs unterstützen aufrufbar (siehe Release)
   * Unterstützt der Browser disese Technologien nicht, ist der Funktionsumfang eingeschränkt
   * In jedem Fall ist das installieren der App empfohlen (Meldung kommt automatisch vom Browser)
 * Für die Erinnerungen-Funktion muss die neuste Version von Google Chrome verwendet werden

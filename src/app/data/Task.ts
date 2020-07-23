@@ -83,7 +83,7 @@ export class Task {
 
   public set deadLineTime(value: string) {
     if (!value) {
-      this._deadLineTime = value;
+      this._deadLineTime = "";
     } else {
       let deadLine = new Date(value);
       const ticksPerMinute = 60000;

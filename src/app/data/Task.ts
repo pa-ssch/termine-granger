@@ -63,7 +63,7 @@ export class Task {
   }
 
   public get duration(): number {
-    return this._duration;
+    return +this._duration;
   }
 
   public set duration(value: number) {

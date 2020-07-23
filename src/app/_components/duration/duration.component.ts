@@ -18,14 +18,7 @@ export class DurationComponent {
   set minuteDuration(value: number) {
     if (this.unitDuration) return;
 
-    if (value == 0) {
-      // Bei Dauer == 0 wird Minuten als Einheit gewählt
-      this.unitDuration = 0;
-      this.unit = this.units[0];
-      return;
-    }
-
-    this.unit = getBestFitUnit(value);
+    this.unit = getBestFitUnit(value, this.units);
     this.unitDuration = Math.floor(value / this.unit.minutes);
   }
 

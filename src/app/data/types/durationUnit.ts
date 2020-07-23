@@ -10,11 +10,20 @@ export function getAllUnits(): durationUnit[] {
   ];
 }
 
-export function getBestFitUnit(duration: number): durationUnit {
+export function getBestFitUnit(duration: number, units?: durationUnit[]): durationUnit {
   // Bei gesetzter Dauer in Minuten, die größtmögliche Einheit festelgen
   // und die Minuten-Dauer in die neue Einheit umrechen (z. B. 60 Minuten zu 1 h umrechnen)
   // --> Einheiten müssen nach Dauer (ASC) sortiert sein
-  var units = getAllUnits().sort((a, b) => a.minutes - b.minutes);
+
+  // Wenn keine Auswahl an einheiten übergeben wurde, alle Einheiten verwenden
+  if (!units) units = getAllUnits().sort((a, b) => a.minutes - b.minutes);
+
+  // Bei Dauer = 0 wird Minuten als Einheit gewählt
+  if (!duration) {
+    return units[0];
+  }
+
+  // Ansonsten größtmögliche Einheit verwenden
   var unit: durationUnit;
   for (let u of units) {
     if (duration % u.minutes > 0) break;

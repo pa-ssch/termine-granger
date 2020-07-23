@@ -43,5 +43,9 @@ Löschen aller Daten:
 Der relevante Sourcecode befindet sich unter [src/app](src/app/)
 
 
+Bezüglich der Lesbarkeit ist es sinnvoll, den Sourcecode herunterzuladen und mit Visual Studio Code zu öffnen.
+Es wird TypeDoc verwendet und oft wird die #region-Funtkion eingesetzt, um den Code zu strukturieren. 
+
+
 ## Jasmine-Test
 Ein Exemplarischer Test für die Funktion `addOrChange` ([taskList](src/app/data/taskList.ts)) ist in der Datei [data.service.spec.ts](src/app/data/data.service.spec.ts)

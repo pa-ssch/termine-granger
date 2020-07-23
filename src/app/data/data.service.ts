@@ -31,9 +31,9 @@ export class DataService {
     let beyondUnicodeSymbol = String.fromCharCode(256);
 
     if (display == "done") {
-      return IDBKeyRange.bound([tId, "0", ""], [tId, "A", beyondUnicodeSymbol]);
+      return IDBKeyRange.bound([tId, "0", 0], [tId, "A", beyondUnicodeSymbol]);
     } else {
-      return IDBKeyRange.bound([tId, "", ""], [tId, "", beyondUnicodeSymbol]);
+      return IDBKeyRange.bound([tId, "", 0], [tId, "", beyondUnicodeSymbol]);
     }
   }
 

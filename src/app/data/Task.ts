@@ -4,9 +4,9 @@ export class Task {
   private _taskId?: number;
   private _title: string = "";
   private _description?: string;
-  private _startTime?: string = "";
+  private _startTime: string = "";
   private _duration: number = 0;
-  private _deadLineTime?: string;
+  private _deadLineTime?: string = "";
   private _priority: uint2 = 1;
   private _isVisible?: boolean;
   private _isBlocker: boolean = true;

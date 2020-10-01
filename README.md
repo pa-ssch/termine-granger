@@ -14,6 +14,7 @@ Aufgabenplanung und -verwaltung
 * Für die Erinnerungen-Funktion muss die neuste Version von Google Chrome verwendet werden
   * Des Weiteren müssen hierfür die "Experimental Web Platform features" über "chrome://flags" aktiviert werden
   * Ob die Konfiguration erfolgreich war, lässt sich mit der offiziellen [demo](https://notification-triggers.glitch.me/) von [Web.dev](https://web.dev/notification-triggers/) überprüfen
+  * Es muss tatsächlich Google Chrome selbst sein. Nicht alle Chromium Browser sind kompatibel.
   
 #### Empfehlung: Google Chrome unter Windows und verwendung der installierten Anwendung, nicht der Webseite.
 

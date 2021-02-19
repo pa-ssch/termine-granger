@@ -1,4 +1,7 @@
 # Termine Granger
+
+The application was developed as part of a study program at a German university and is therefore only documented in German.
+
 Aufgabenplanung und -verwaltung
 
 #### Prototyp für den Kurs Softwareengineering I (3. + 4. Semester) an der DHBW Karlsruhe
